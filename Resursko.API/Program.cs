@@ -26,7 +26,7 @@ namespace Resursko.API
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            builder.Services.AddIdentity<User, IdentityRole>(options =>
+            builder.Services.AddIdentity<User, Role>(options =>
             {
                 options.User.RequireUniqueEmail = true;
                 options.Password.RequiredLength = 7;
@@ -55,7 +55,10 @@ namespace Resursko.API
                 });
 
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<AccountServiceHelper>();
             builder.Services.AddSingleton<JwtService>();
+            
 
             var app = builder.Build();
 

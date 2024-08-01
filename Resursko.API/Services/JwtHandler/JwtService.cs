@@ -8,14 +8,21 @@ namespace Resursko.API.Services.JwtHandler;
 public class JwtService(IConfiguration configuration)
 {
     private readonly IConfigurationSection _jwtSettings = configuration.GetSection("JwtSettings");
-    private List<Claim> GetUserClaims(User user)
+    private List<Claim> GetUserClaims(User user, IList<string> roles)
     {
-        return new List<Claim>
+        var claims =  new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Name, user.UserName!),
             new Claim(ClaimTypes.Email, user.Email!)
         };
+
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        return claims;
     }
 
     private SigningCredentials GetUserCredentials()
@@ -35,9 +42,9 @@ public class JwtService(IConfiguration configuration)
             );
     }
 
-    public string CreateToken(User user)
+    public string CreateToken(User user, IList<string> roles)
     {
-        var claims = GetUserClaims(user);
+        var claims = GetUserClaims(user, roles);
         var creds = GetUserCredentials();
         var token = GenerateTokenOptions(creds, claims);
         
