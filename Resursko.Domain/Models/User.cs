@@ -1,6 +1,8 @@
-﻿namespace Resursko.Domain.Models;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User
+namespace Resursko.Domain.Models;
+
+public class User : IdentityUser
 {
     public string FirstName {  get; set; }
     public string LastName { get; set; }
