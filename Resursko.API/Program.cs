@@ -1,10 +1,12 @@
 global using Microsoft.EntityFrameworkCore;
 global using Resursko.API.Data;
 global using Resursko.Domain.Models;
+global using Resursko.Domain.DTOs.Account;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Resursko.API.Services.Account;
 namespace Resursko.API
 {
     public class Program
@@ -50,6 +52,7 @@ namespace Resursko.API
                     };
                 });
 
+            builder.Services.AddScoped<IAccountService, AccountService>();
 
             var app = builder.Build();
 
