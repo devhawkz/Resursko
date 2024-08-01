@@ -28,6 +28,7 @@ namespace Resursko.API
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.User.RequireUniqueEmail = true;
+                options.Password.RequiredLength = 7;
             }).AddEntityFrameworkStores<DataContext>()
             .AddDefaultTokenProviders();
 

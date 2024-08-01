@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Identity;
 
 namespace Resursko.API.Services.Account;
 
@@ -6,14 +8,8 @@ public class AccountService(UserManager<User> userManager) : IAccountService
 {
     public async Task<AccountRegistrationResponse> RegisterAsync(AccountRegistrationRequest request)
     {
-        var newUser = new User
-        {
-            FirstName = request.FirstName!,
-            LastName = request.LastName!,
-            UserName = request.Username,
-            Email = request.Email
-        };
-
+        var newUser =  request.Adapt<User>();
+        newUser.UserName = request.Username;
         var result = await userManager.CreateAsync(newUser, request.Password!);
 
         if (!result.Succeeded)
