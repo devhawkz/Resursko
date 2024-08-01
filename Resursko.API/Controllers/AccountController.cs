@@ -21,4 +21,18 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
         return BadRequest(result.Errors);
     }
+
+    [HttpPost]
+    public async Task<ActionResult<AccountLoginResponse>> Login(AccountLoginRequest request)
+    {
+        if(!ModelState.IsValid)
+            return BadRequest("Invalid data entered");
+
+        var result = await accountService.LoginAsync(request);
+
+        if (result.IsSuccessful)
+            return Ok(result);
+
+        return Unauthorized(result.ErrorMessage);
+    }
 }

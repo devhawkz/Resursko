@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Resursko.API.Services.Account;
+using Resursko.API.Services.JwtHandler;
 namespace Resursko.API
 {
     public class Program
@@ -54,6 +55,7 @@ namespace Resursko.API
                 });
 
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddSingleton<JwtService>();
 
             var app = builder.Build();
 
