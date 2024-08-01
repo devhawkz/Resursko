@@ -5,6 +5,8 @@ VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resursko.API", "Resursko.API\Resursko.API.csproj", "{02BD3118-A9FE-4E67-8E7A-80E530304520}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resursko.Domain", "Resursko.Domain\Resursko.Domain.csproj", "{4D705E92-1851-418F-8413-B2A9A912E3CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{02BD3118-A9FE-4E67-8E7A-80E530304520}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02BD3118-A9FE-4E67-8E7A-80E530304520}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02BD3118-A9FE-4E67-8E7A-80E530304520}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D705E92-1851-418F-8413-B2A9A912E3CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D705E92-1851-418F-8413-B2A9A912E3CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D705E92-1851-418F-8413-B2A9A912E3CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D705E92-1851-418F-8413-B2A9A912E3CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
