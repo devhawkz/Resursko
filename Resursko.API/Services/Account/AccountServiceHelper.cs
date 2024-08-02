@@ -32,7 +32,6 @@ public class AccountServiceHelper(RoleManager<Role> roleManager)
         }
 
     }
-
     private async Task<Role> CreateNewRole(string roleName)
     {
         var role = new Role
@@ -49,7 +48,6 @@ public class AccountServiceHelper(RoleManager<Role> roleManager)
 
         return role;
     }
-
     public User GetUser(AccountRegistrationRequest request)
     {
         var newUser = request.Adapt<User>();

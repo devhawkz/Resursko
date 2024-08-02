@@ -1,14 +1,6 @@
-﻿using Mapster;
-using MapsterMapper;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Resursko.API.Services.JwtHandler;
-using Resursko.Domain.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.InteropServices;
-using System.Security.Claims;
-using System.Text;
 
 namespace Resursko.API.Services.Account;
 public class AccountService(UserManager<User> userManager, SignInManager<User> signInManager, JwtService jwtService, AccountServiceHelper serviceHelper) : IAccountService
