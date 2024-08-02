@@ -28,9 +28,6 @@ public class AccountService(UserManager<User> userManager, SignInManager<User> s
 
         return new AccountLoginResponse(true, Token: jwtToken);
     }
-
-    
-
     public async Task<AccountRegistrationResponse> RegisterAsync(AccountRegistrationRequest request)
     {
         var newUser = serviceHelper.GetUser(request); 
