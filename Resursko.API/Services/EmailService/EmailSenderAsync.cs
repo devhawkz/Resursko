@@ -15,7 +15,7 @@ public class EmailSenderAsync(EmailConfiguration emailConfiguration) : IEmailSen
     private MimeMessage CreateEmailMessage(Message message)
     {
         var emailMessage = new MimeMessage();
-        emailMessage.From.Add(new MailboxAddress("Resursko", emailConfiguration.From));
+        emailMessage.From.Add(new MailboxAddress(emailConfiguration.From));
         emailMessage.To.AddRange(message.To);
         emailMessage.Subject = message.Subject;
         emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content};
