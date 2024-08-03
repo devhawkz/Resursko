@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Resursko.API.Services.EmailService;
 using Resursko.API.Services.JwtHandler;
 
 namespace Resursko.API.Services.Account;
-public class AccountService(UserManager<User> userManager, SignInManager<User> signInManager, JwtService jwtService, AccountServiceHelper serviceHelper) : IAccountService
+public class AccountService(UserManager<User> userManager, SignInManager<User> signInManager, JwtService jwtService, AccountServiceHelper serviceHelper, IEmailSenderAsync emailSender) : IAccountService
 {
     public async Task<AccountLoginResponse> LoginAsync(AccountLoginRequest request)
     {
@@ -34,6 +35,10 @@ public class AccountService(UserManager<User> userManager, SignInManager<User> s
         var role = await serviceHelper.GetRoleAsync("user");
 
         await userManager.AddToRoleAsync(newUser, role.Name!);
+
+        var message = new Message(new string[] { request.Email! }, "User registration", "You have successfully register to our app!");
+
+        await emailSender.SendEmailAsync(message);
 
         return new AccountRegistrationResponse(true);
     }

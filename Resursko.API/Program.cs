@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Resursko.API.Services.Account;
 using Resursko.API.Services.JwtHandler;
+using Resursko.API.Services.EmailService;
 namespace Resursko.API
 {
     public class Program
@@ -26,7 +27,7 @@ namespace Resursko.API
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            var emailConfing = builder.Configuration
+            var emailConfig = builder.Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
 
@@ -58,7 +59,8 @@ namespace Resursko.API
                     };
                 });
 
-            builder.Services.AddSingleton(emailConfing!);
+            builder.Services.AddSingleton(emailConfig!);
+            builder.Services.AddScoped<IEmailSenderAsync, EmailSenderAsync>();
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<AccountServiceHelper>();
