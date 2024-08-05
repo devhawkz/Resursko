@@ -4,6 +4,8 @@ namespace Resursko.API.Services.ResourceService;
 
 public interface IServiceResoruce
 {
-    Task<ResourceResponse> CreateResource(CreateResourceRequest request);
+    Task<ResourceResponse> CreateResource(ResourceRequest request);
     Task<List<Resource>> GetAllResources();
+
+    Task<ResourceResponse> UpdateResource(ResourceRequest request, int id);
 }

@@ -7,7 +7,7 @@ namespace Resursko.API.Services.ResourceService;
 
 public class ServiceResource(IResourceRespository resourceRespository) : IServiceResoruce
 {
-    public async Task<ResourceResponse> CreateResource(CreateResourceRequest request)
+    public async Task<ResourceResponse> CreateResource(ResourceRequest request)
     {
         var resource = request.Adapt<Resource>();
         var result = await resourceRespository.CreateResource(resource);
@@ -20,6 +20,14 @@ public class ServiceResource(IResourceRespository resourceRespository) : IServic
         var result = await resourceRespository.GetAllResources();
         if (result.Count == 0)
             return new List<Resource>();
+
+        return result;
+    }
+
+    public async Task<ResourceResponse> UpdateResource(ResourceRequest request, int id)
+    {
+        var resource = request.Adapt<Resource>();
+        var result = await resourceRespository.UpdateResource(resource, id);
 
         return result;
     }

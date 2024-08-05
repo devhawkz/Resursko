@@ -18,6 +18,20 @@ public class ResourceRespository(DataContext context) : IResourceRespository
 
     public async Task<List<Resource>> GetAllResources() => await context.Resources.ToListAsync();
 
+    public async Task<ResourceResponse> UpdateResource(Resource resource, int id)
+    {
+        var oldResource = await context.Resources.FindAsync(id);
+        if (oldResource is null)
+            return new ResourceResponse(false, $"Resource with id: {id} doesn't exist");
+
+        oldResource.Name = resource.Name;
+        oldResource.Description = resource.Description;
+        await context.SaveChangesAsync();
+
+        return new ResourceResponse(true);
+
+    }
+
     private async Task<ResourceResponse> CheckNameInDatabase(string name)
     {
         var resource = await context.Resources.FirstOrDefaultAsync(r => r.Name == name);

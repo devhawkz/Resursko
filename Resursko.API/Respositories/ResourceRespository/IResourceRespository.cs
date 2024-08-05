@@ -7,4 +7,6 @@ public interface IResourceRespository
     Task<ResourceResponse> CreateResource(Resource resource);
     Task<List<Resource>> GetAllResources();
 
+    Task<ResourceResponse> UpdateResource(Resource resource, int id);
+
 }

@@ -12,7 +12,7 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
 {
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult<ResourceResponse>> CreateResource(CreateResourceRequest request)
+    public async Task<ActionResult<ResourceResponse>> CreateResource(ResourceRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest("Invalid data entered!");
@@ -25,6 +25,7 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet]
     public async Task<ActionResult<List<Resource>>> GetAllResources()
     {
         var result = await serviceResoruce.GetAllResources();
@@ -33,5 +34,20 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
             return Ok(result);
 
         return BadRequest("The resource table is empty");
+    }
+
+    
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ResourceResponse>> UpdateResource(ResourceRequest request, int id)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Invalid data entered!");
+
+        var result = await serviceResoruce.UpdateResource(request, id);
+        
+        if(result.IsSuccessful)
+            return Ok(result);
+
+        return BadRequest(result.ErrorMessage);
     }
 }

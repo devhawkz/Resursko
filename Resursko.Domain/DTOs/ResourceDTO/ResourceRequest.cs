@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Resursko.Domain.DTOs.ResourceDTO;
-public class CreateResourceRequest
+public class ResourceRequest
 {
     [Required]
     public string? Name { get; set; }
