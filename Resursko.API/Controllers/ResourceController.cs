@@ -24,4 +24,14 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
 
         return BadRequest(result.ErrorMessage);
     }
+
+    public async Task<ActionResult<List<Resource>>> GetAllResources()
+    {
+        var result = await serviceResoruce.GetAllResources();
+
+        if (result is not null)
+            return Ok(result);
+
+        return BadRequest("The resource table is empty");
+    }
 }

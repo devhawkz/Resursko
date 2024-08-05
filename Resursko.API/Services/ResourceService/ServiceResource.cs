@@ -14,4 +14,13 @@ public class ServiceResource(IResourceRespository resourceRespository) : IServic
 
         return result;
     }
+
+    public async Task<List<Resource>> GetAllResources()
+    {
+        var result = await resourceRespository.GetAllResources();
+        if (result.Count == 0)
+            return new List<Resource>();
+
+        return result;
+    }
 }

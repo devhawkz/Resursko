@@ -16,6 +16,8 @@ public class ResourceRespository(DataContext context) : IResourceRespository
         return result;
     }
 
+    public async Task<List<Resource>> GetAllResources() => await context.Resources.ToListAsync();
+
     private async Task<ResourceResponse> CheckNameInDatabase(string name)
     {
         var resource = await context.Resources.FirstOrDefaultAsync(r => r.Name == name);

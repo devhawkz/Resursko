@@ -5,5 +5,6 @@ namespace Resursko.API.Respositories.ResourceRespository;
 public interface IResourceRespository
 {
     Task<ResourceResponse> CreateResource(Resource resource);
+    Task<List<Resource>> GetAllResources();
 
 }
