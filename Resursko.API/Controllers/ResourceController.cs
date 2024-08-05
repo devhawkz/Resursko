@@ -36,7 +36,7 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
         return BadRequest("The resource table is empty");
     }
 
-    
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult<ResourceResponse>> UpdateResource(ResourceRequest request, int id)
     {
@@ -46,6 +46,18 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
         var result = await serviceResoruce.UpdateResource(request, id);
         
         if(result.IsSuccessful)
+            return Ok(result);
+
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<ResourceResponse>> DeleteResource(int id)
+    {
+        var result = await serviceResoruce.DeleteResource(id);
+        
+        if (result.IsSuccessful)
             return Ok(result);
 
         return BadRequest(result.ErrorMessage);

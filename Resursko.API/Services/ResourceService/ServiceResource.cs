@@ -31,4 +31,10 @@ public class ServiceResource(IResourceRespository resourceRespository) : IServic
 
         return result;
     }
+
+    public async Task<ResourceResponse> DeleteResource(int id)
+    {
+        var result = await resourceRespository.DeleteResource(id);
+        return result;
+    }
 }

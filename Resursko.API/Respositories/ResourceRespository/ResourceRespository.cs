@@ -20,12 +20,25 @@ public class ResourceRespository(DataContext context) : IResourceRespository
 
     public async Task<ResourceResponse> UpdateResource(Resource resource, int id)
     {
-        var oldResource = await context.Resources.FindAsync(id);
-        if (oldResource is null)
+        var dbResource = await context.Resources.FindAsync(id);
+        if (dbResource is null)
             return new ResourceResponse(false, $"Resource with id: {id} doesn't exist");
 
-        oldResource.Name = resource.Name;
-        oldResource.Description = resource.Description;
+        dbResource.Name = resource.Name;
+        dbResource.Description = resource.Description;
+        await context.SaveChangesAsync();
+
+        return new ResourceResponse(true);
+
+    }
+
+    public async Task<ResourceResponse> DeleteResource(int id)
+    {
+        var dbResource = await context.Resources.FindAsync(id);
+        if (dbResource is null)
+            return new ResourceResponse(false, $"Resource with id: {id} doesn't exist");
+
+        context.Resources.Remove(dbResource);
         await context.SaveChangesAsync();
 
         return new ResourceResponse(true);

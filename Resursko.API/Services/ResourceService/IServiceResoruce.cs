@@ -8,4 +8,6 @@ public interface IServiceResoruce
     Task<List<Resource>> GetAllResources();
 
     Task<ResourceResponse> UpdateResource(ResourceRequest request, int id);
+
+    Task<ResourceResponse> DeleteResource(int id);
 }
