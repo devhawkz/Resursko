@@ -9,6 +9,8 @@ using System.Text;
 using Resursko.API.Services.Account;
 using Resursko.API.Services.JwtHandler;
 using Resursko.API.Services.EmailService;
+using Resursko.API.Respositories.ResourceRespository;
+using Resursko.API.Services.ResourceService;
 namespace Resursko.API
 {
     public class Program
@@ -65,6 +67,8 @@ namespace Resursko.API
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<AccountServiceHelper>();
             builder.Services.AddSingleton<JwtService>();
+            builder.Services.AddScoped<IResourceRespository, ResourceRespository>();
+            builder.Services.AddScoped<IServiceResoruce, ServiceResource>();
            
             
             var app = builder.Build();
