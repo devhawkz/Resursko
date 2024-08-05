@@ -65,8 +65,8 @@ namespace Resursko.API
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<AccountServiceHelper>();
             builder.Services.AddSingleton<JwtService>();
+           
             
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
