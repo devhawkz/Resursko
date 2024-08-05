@@ -6,6 +6,7 @@ namespace Resursko.API.Services.Account
 {
     public class AdminService(UserManager<User> userManager, AccountServiceHelper serviceHelper, IEmailSenderAsync emailSender) : IAdminService
     {
+        private const string _roleName = "admin";
         public async Task<AccountRegistrationResponse> RegisterAdminAsync(AccountRegistrationRequest request)
         {
             var newUser = serviceHelper.GetUser(request);
@@ -17,7 +18,7 @@ namespace Resursko.API.Services.Account
                 return new AccountRegistrationResponse(false, errors);
             }
 
-            var role = await serviceHelper.GetRoleAsync("admin");
+            var role = await serviceHelper.GetRoleAsync(_roleName);
 
             await userManager.AddToRoleAsync(newUser, role.Name!);
 

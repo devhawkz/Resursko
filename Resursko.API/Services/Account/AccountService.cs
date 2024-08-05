@@ -6,6 +6,7 @@ using Resursko.API.Services.JwtHandler;
 namespace Resursko.API.Services.Account;
 public class AccountService(UserManager<User> userManager, SignInManager<User> signInManager, JwtService jwtService, AccountServiceHelper serviceHelper, IEmailSenderAsync emailSender) : IAccountService
 {
+    private const string _roleName = "user"; 
     public async Task<AccountLoginResponse> LoginAsync(AccountLoginRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email!);
@@ -32,7 +33,7 @@ public class AccountService(UserManager<User> userManager, SignInManager<User> s
             return new AccountRegistrationResponse(false, errors);
         }
 
-        var role = await serviceHelper.GetRoleAsync("user");
+        var role = await serviceHelper.GetRoleAsync(_roleName);
 
         await userManager.AddToRoleAsync(newUser, role.Name!);
 
