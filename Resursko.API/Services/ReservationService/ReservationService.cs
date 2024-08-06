@@ -25,9 +25,21 @@ public class ReservationService(IReservationRespository reservationRespository) 
 
     public async Task<ReservationResponse> UpdateReservation(ReservationRequest request, int id)
     {
+        if (id <= 0)
+            return new ReservationResponse(false, $"Reservation id can't have this value: {id}");
+
         var updatedReservation = request.Adapt<Reservation>();
         var result = await reservationRespository.UpdateReservation(updatedReservation, id);
 
+        return result;
+    }
+
+    public async Task<ReservationResponse> DeleteReservation(int id)
+    {
+        if (id <= 0)
+            return new ReservationResponse(false, $"Reservation id can't have this value: {id}");
+
+        var result = await reservationRespository.DeleteReservation(id);
         return result;
     }
 }

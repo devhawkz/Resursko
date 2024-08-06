@@ -50,4 +50,15 @@ public class ReservationController(IReservationService reservationService) : Con
 
         return BadRequest(result);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<ReservationResponse>> DeleteReservation(int id)
+    {
+        var result = await reservationService.DeleteReservation(id);
+
+        if (result.IsSuccessful)
+            return Ok(result);
+
+        return BadRequest(result);
+    }
 }

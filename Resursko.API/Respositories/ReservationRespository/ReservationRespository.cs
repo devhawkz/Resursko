@@ -71,6 +71,17 @@ public class ReservationRespository(DataContext context, IUserContextService use
         return new ReservationResponse(true);
     }
 
+    public async Task<ReservationResponse> DeleteReservation(int id)
+    {
+        var reservation = await context.Reservations.FindAsync(id);
+        if(reservation is null)
+            return new ReservationResponse(false, $"Reservation with id: {id} doesn't exist");
+
+        context.Reservations.Remove(reservation);
+        await context.SaveChangesAsync();
+        return new ReservationResponse(true);
+    }
+
     private bool IsResourceAvailable(Resource resource)
     {
         if (resource.IsAvailable)
