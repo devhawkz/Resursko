@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Resursko.API.Services.ReservationService;
@@ -9,7 +10,7 @@ namespace Resursko.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Admin, User")]
+[Authorize]
 public class ReservationController(IReservationService reservationService) : ControllerBase
 {
     [HttpPost]
@@ -20,7 +21,7 @@ public class ReservationController(IReservationService reservationService) : Con
 
         var result = await reservationService.CreateNewReservation(request);
 
-        if(result is not null)
+        if(result.IsSuccessful)
             return Ok(result);
 
         return BadRequest(result);
@@ -34,5 +35,19 @@ public class ReservationController(IReservationService reservationService) : Con
             return Ok(result);
 
         return NotFound("There is no reservation in database");
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ReservationResponse>> UpdateReservation(ReservationRequest request, int id)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        var result = await reservationService.UpdateReservation(request, id);
+
+        if(result.IsSuccessful)
+            return Ok(result);
+
+        return BadRequest(result);
     }
 }

@@ -22,4 +22,12 @@ public class ReservationService(IReservationRespository reservationRespository) 
 
         return result;
     }
+
+    public async Task<ReservationResponse> UpdateReservation(ReservationRequest request, int id)
+    {
+        var updatedReservation = request.Adapt<Reservation>();
+        var result = await reservationRespository.UpdateReservation(updatedReservation, id);
+
+        return result;
+    }
 }

@@ -14,6 +14,8 @@ using Resursko.API.Services.ResourceService;
 using Resursko.API.Respositories.ReservationRespository;
 using Resursko.API.Services.ReservationService;
 using Resursko.API.Services.UserContext;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 namespace Resursko.API
 {
     public class Program
@@ -27,7 +29,16 @@ namespace Resursko.API
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("oath2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+            });
 
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
