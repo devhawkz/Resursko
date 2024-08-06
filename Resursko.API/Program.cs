@@ -11,6 +11,8 @@ using Resursko.API.Services.JwtHandler;
 using Resursko.API.Services.EmailService;
 using Resursko.API.Respositories.ResourceRespository;
 using Resursko.API.Services.ResourceService;
+using Resursko.API.Respositories.ReservationRespository;
+using Resursko.API.Services.ReservationService;
 namespace Resursko.API
 {
     public class Program
@@ -69,6 +71,8 @@ namespace Resursko.API
             builder.Services.AddSingleton<JwtService>();
             builder.Services.AddScoped<IResourceRespository, ResourceRespository>();
             builder.Services.AddScoped<IServiceResoruce, ServiceResource>();
+            builder.Services.AddScoped<IReservationRespository, ReservationRespository>();
+            builder.Services.AddScoped<IReservationService, ReservationService>();
            
             
             var app = builder.Build();
