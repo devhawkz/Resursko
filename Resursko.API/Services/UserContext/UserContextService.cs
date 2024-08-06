@@ -18,4 +18,10 @@ public class UserContextService(IHttpContextAccessor contextAccessor, UserManage
         return contextAccessor.HttpContext?.User
             .FindFirstValue(ClaimTypes.NameIdentifier);
     }
+
+    public string? GetUserEmail()
+    {
+        return contextAccessor.HttpContext?.User
+            .FindFirstValue (ClaimTypes.Email);
+    }
 }

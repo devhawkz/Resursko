@@ -1,10 +1,11 @@
-﻿using Resursko.API.Services.UserContext;
+﻿using Resursko.API.Services.EmailService;
+using Resursko.API.Services.UserContext;
 using Resursko.Domain.DTOs.ReservationDTO;
 using Resursko.Domain.Models;
 
 namespace Resursko.API.Respositories.ReservationRespository;
 
-public class ReservationRespository(DataContext context, IUserContextService userContextService) : IReservationRespository
+public class ReservationRespository(DataContext context, IUserContextService userContextService, IEmailSenderAsync emailSender) : IReservationRespository
 {
     public async Task<ReservationResponse> CreateNewReservation(Reservation reservation)
     {
@@ -23,7 +24,11 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
         context.Reservations.Add(reservation);
         await context.SaveChangesAsync();
-        
+
+        var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation created", $"You have successfully created reservation with id {reservation.Id}");
+
+        await emailSender.SendEmailAsync(message);
+
         return new ReservationResponse(true);
     }
 
@@ -70,6 +75,10 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
         await context.SaveChangesAsync();
 
+        var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation update", $"You have successfully updateds reservation with id {id}");
+
+        await emailSender.SendEmailAsync(message);
+
         return new ReservationResponse(true);
     }
 
@@ -81,6 +90,10 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
         context.Reservations.Remove(reservation);
         await context.SaveChangesAsync();
+
+        var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation canceled", $"You have successfully canceled reservation with id {reservation.Id}");
+        await emailSender.SendEmailAsync(message);
+
         return new ReservationResponse(true);
     }
 
