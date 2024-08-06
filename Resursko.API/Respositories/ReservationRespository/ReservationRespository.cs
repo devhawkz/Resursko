@@ -36,6 +36,8 @@ public class ReservationRespository(DataContext context, IUserContextService use
     {
         await SetStatus();
 
+        await Reminder();
+
         return await context.Reservations
             .Include(r => r.User)
             .Include(r => r.Resource)
@@ -122,6 +124,25 @@ public class ReservationRespository(DataContext context, IUserContextService use
         {
             reservation.Resource.IsAvailable = true;
             reservation.Status = "inactive";
+        }
+
+        await context.SaveChangesAsync();
+    }
+    private async Task Reminder()
+    {
+        var activeReservations = await context.Reservations
+            .Where(r =>  r.Status == "active")
+            .ToListAsync();
+
+        foreach (var reservation in activeReservations)
+        {
+            TimeSpan difference = reservation.StartTime - DateTime.Now;
+
+           if(difference <= TimeSpan.FromDays(1))
+            {
+                var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation reminder", $"You have reservation with id {reservation.Id} that begins in one day");
+                await emailSender.SendEmailAsync(message);
+            }
         }
 
         await context.SaveChangesAsync();
