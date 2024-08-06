@@ -90,6 +90,12 @@ public class ReservationRespository(DataContext context, IUserContextService use
         if(reservation is null)
             return new ReservationResponse(false, $"Reservation with id: {id} doesn't exist");
 
+        // making resource free
+        var resource = await context.Resources.FindAsync(reservation.ResourceId);
+        reservation.Resource = resource!;
+        reservation.Resource.IsAvailable = true;
+        
+        // removing reservation
         context.Reservations.Remove(reservation);
         await context.SaveChangesAsync();
 
@@ -131,6 +137,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
     private async Task Reminder()
     {
         var activeReservations = await context.Reservations
+            .Include(r => r.User)
             .Where(r =>  r.Status == "active")
             .ToListAsync();
 
@@ -140,7 +147,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
            if(difference <= TimeSpan.FromDays(1))
             {
-                var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation reminder", $"You have reservation with id {reservation.Id} that begins in one day");
+                var message = new Message(new string[] { reservation.User.Email! }, "Reservation reminder", $"You have reservation with id {reservation.Id} that begins in one day");
                 await emailSender.SendEmailAsync(message);
             }
         }
