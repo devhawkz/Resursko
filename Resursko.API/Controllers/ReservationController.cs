@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Resursko.API.Services.ReservationService;
 using Resursko.Domain.DTOs.ReservationDTO;
 
@@ -11,6 +12,20 @@ namespace Resursko.API.Controllers;
 [Authorize(Roles = "Admin, User")]
 public class ReservationController(IReservationService reservationService) : ControllerBase
 {
+    [HttpPost]
+    public async Task<ActionResult<ReservationResponse>> CreateNewReservation(ReservationRequest request)
+    {
+        if(!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await reservationService.CreateNewReservation(request);
+
+        if(result is not null)
+            return Ok(result);
+
+        return BadRequest(result);
+    }
+
     [HttpGet]
     public async Task<ActionResult<List<GetAllReservationResponse>>> GetAllReservations()
     {

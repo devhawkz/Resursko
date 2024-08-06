@@ -13,6 +13,7 @@ using Resursko.API.Respositories.ResourceRespository;
 using Resursko.API.Services.ResourceService;
 using Resursko.API.Respositories.ReservationRespository;
 using Resursko.API.Services.ReservationService;
+using Resursko.API.Services.UserContext;
 namespace Resursko.API
 {
     public class Program
@@ -73,6 +74,7 @@ namespace Resursko.API
             builder.Services.AddScoped<IServiceResoruce, ServiceResource>();
             builder.Services.AddScoped<IReservationRespository, ReservationRespository>();
             builder.Services.AddScoped<IReservationService, ReservationService>();
+            builder.Services.AddScoped<IUserContextService, UserContextService>();
            
             
             var app = builder.Build();
