@@ -29,6 +29,8 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
     public async Task<List<GetAllReservationResponse>> GetAllReservations()
     {
+        await SetStatus();
+
         return await context.Reservations
             .Include(r => r.User)
             .Include(r => r.Resource)
@@ -90,5 +92,25 @@ public class ReservationRespository(DataContext context, IUserContextService use
             return true;
         }
         return false;
+    }
+
+    private bool IsReservationNonActive(Reservation reservation) => reservation.EndTime < DateTime.Now;
+
+    private async Task SetStatus()
+    {
+        var now = DateTime.Now;
+
+        var inactiveReservations = await context.Reservations
+            .Include(r => r.Resource)
+            .Where(r => r.EndTime < now && r.Status != "inactive")
+            .ToListAsync();
+
+        foreach (var reservation in inactiveReservations)
+        {
+            reservation.Resource.IsAvailable = true;
+            reservation.Status = "inactive";
+        }
+
+        await context.SaveChangesAsync();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.AspNetCore.Rewrite;
 using Resursko.API.Respositories.ResourceRespository;
 using Resursko.Domain.DTOs.ResourceDTO;
 using System.ComponentModel.Design;
@@ -18,7 +19,7 @@ public class ServiceResource(IResourceRespository resourceRespository) : IServic
     public async Task<List<Resource>> GetAllResources()
     {
         var result = await resourceRespository.GetAllResources();
-        if (result.Count == 0)
+        if (result is null || result.Count == 0)
             return new List<Resource>();
 
         return result;

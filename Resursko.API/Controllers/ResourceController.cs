@@ -30,10 +30,10 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
     {
         var result = await serviceResoruce.GetAllResources();
 
-        if (result is not null)
+        if (result is not null && result.Count > 0)
             return Ok(result);
 
-        return BadRequest("The resource table is empty");
+        return NotFound("There is no resource in database");
     }
 
     [Authorize(Roles = "Admin")]
