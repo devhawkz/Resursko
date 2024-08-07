@@ -7,6 +7,8 @@ namespace Resursko.API.Respositories.ReservationRespository;
 
 public class ReservationRespository(DataContext context, IUserContextService userContextService, IEmailSenderAsync emailSender) : IReservationRespository
 {
+    private static List<Reservation> _reservations = new List<Reservation>();
+
     public async Task<ReservationResponse> CreateNewReservation(Reservation reservation)
     {
         var userId = userContextService.GetUserId();
@@ -19,7 +21,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
         reservation.Resource = await context.Resources.FindAsync(reservation.ResourceId);
         reservation.User = await context.Users.FindAsync(userId);
 
-        if (!IsResourceAvailable(reservation.Resource!))
+        if (!IsResourceAvailable(reservation))
             return new ReservationResponse(false, "Resource is not available in selected period.");
 
         context.Reservations.Add(reservation);
@@ -34,23 +36,20 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
     public async Task<List<GetAllReservationResponse>> GetAllReservations()
     {
-        await SetStatus();
-
+        await GetAllReservationsFromDb();
         await Reminder();
 
-        return await context.Reservations
-            .Include(r => r.User)
-            .Include(r => r.Resource)
-            .Select(r => new GetAllReservationResponse
-            {
-                Username = r.User.UserName,
-                Email = r.User.Email,
-                ResourceName = r.Resource.Name,
-                StartTime = r.StartTime,
-                EndTime = r.EndTime,
-                Status = r.Status
-            })
-            .ToListAsync();
+        return _reservations
+             .Select(r => new GetAllReservationResponse
+             {
+                 Username = r.User.UserName,
+                 Email = r.User.Email,
+                 ResourceName = r.Resource.Name,
+                 StartTime = r.StartTime,
+                 EndTime = r.EndTime,
+                 Status = r.Status
+             })
+             .ToList();
     }
 
     public async Task<ReservationResponse> UpdateReservation(Reservation reservation, int id)
@@ -69,6 +68,9 @@ public class ReservationRespository(DataContext context, IUserContextService use
         var resource = await context.Resources.FindAsync(reservation.ResourceId);
         if (resource is null)
             return new ReservationResponse(false, $"Resource with id: {reservation.ResourceId} doesn't exist");
+
+        if(!IsResourceAvailable(reservation))
+            return new ReservationResponse(false, "Resource is not available in selected period.");
 
         dbReservation.StartTime = reservation.StartTime;
         dbReservation.EndTime = reservation.EndTime;
@@ -89,11 +91,6 @@ public class ReservationRespository(DataContext context, IUserContextService use
         var reservation = await context.Reservations.FindAsync(id);
         if(reservation is null)
             return new ReservationResponse(false, $"Reservation with id: {id} doesn't exist");
-
-        // making resource free
-        var resource = await context.Resources.FindAsync(reservation.ResourceId);
-        reservation.Resource = resource!;
-        reservation.Resource.IsAvailable = true;
         
         // removing reservation
         context.Reservations.Remove(reservation);
@@ -105,35 +102,32 @@ public class ReservationRespository(DataContext context, IUserContextService use
         return new ReservationResponse(true);
     }
 
-    private bool IsResourceAvailable(Resource resource)
+    private bool IsResourceAvailable(Reservation reservation)
     {
-        if (resource.IsAvailable)
+        var activeReservations = _reservations
+            .Where(r => r.ResourceId == reservation.ResourceId && r.Status == "active")
+            .OrderBy(r => r.StartTime)
+            .ToList();
+
+        foreach(var activeReservation in activeReservations)
         {
-            resource.IsAvailable = false;
-            return true;
-        }
-        return false;
-    }
-
-    private bool IsReservationNonActive(Reservation reservation) => reservation.EndTime < DateTime.Now;
-
-    private async Task SetStatus()
-    {
-        var now = DateTime.Now;
-
-        var inactiveReservations = await context.Reservations
-            .Include(r => r.Resource)
-            .Where(r => r.EndTime < now && r.Status != "inactive")
-            .ToListAsync();
-
-        foreach (var reservation in inactiveReservations)
-        {
-            reservation.Resource.IsAvailable = true;
-            reservation.Status = "inactive";
+            if(reservation.StartTime < activeReservation.EndTime && reservation.EndTime > activeReservation.StartTime)
+                return false;      
         }
 
-        await context.SaveChangesAsync();
+        return true;
     }
+
+    private async Task<List<Reservation>> GetAllReservationsFromDb()
+    {
+        _reservations = await context.Reservations
+           .Include(r => r.User)
+           .Include(r => r.Resource)
+           .ToListAsync();
+
+        return _reservations;
+    }
+
     private async Task Reminder()
     {
         var activeReservations = await context.Reservations
