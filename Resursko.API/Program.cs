@@ -16,6 +16,7 @@ using Resursko.API.Services.ReservationService;
 using Resursko.API.Services.UserContext;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Resursko.API.Services.ForgotPasswotdService;
 namespace Resursko.API
 {
     public class Program
@@ -54,6 +55,10 @@ namespace Resursko.API
             }).AddEntityFrameworkStores<DataContext>()
             .AddDefaultTokenProviders();
 
+            // configuring life span of security token (for reset password)
+            builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromMinutes(15));
+
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
             builder.Services.AddAuthentication(options =>
             {
@@ -86,6 +91,7 @@ namespace Resursko.API
             builder.Services.AddScoped<IReservationRespository, ReservationRespository>();
             builder.Services.AddScoped<IReservationService, ReservationService>();
             builder.Services.AddScoped<IUserContextService, UserContextService>();
+            builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
            
             
             var app = builder.Build();
