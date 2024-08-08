@@ -8,6 +8,7 @@ namespace Resursko.API.Respositories.ReservationRespository;
 public class ReservationRespository(DataContext context, IUserContextService userContextService, IEmailSenderAsync emailSender) : IReservationRespository
 {
     private static List<Reservation> _reservations = new List<Reservation>();
+    private static bool _isListChanged = false;
 
     public async Task<ReservationResponse> CreateNewReservation(Reservation reservation)
     {
@@ -21,11 +22,12 @@ public class ReservationRespository(DataContext context, IUserContextService use
         reservation.Resource = await context.Resources.FindAsync(reservation.ResourceId);
         reservation.User = await context.Users.FindAsync(userId);
 
-        if (!IsResourceAvailable(reservation))
+        if (!await IsResourceAvailable(reservation))
             return new ReservationResponse(false, "Resource is not available in selected period.");
 
         context.Reservations.Add(reservation);
         await context.SaveChangesAsync();
+        _isListChanged = true;
 
         var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation created", $"You have successfully created reservation with id {reservation.Id}");
 
@@ -36,6 +38,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
     public async Task<List<GetAllReservationResponse>> GetAllReservations()
     {
+        _isListChanged = false;
         await GetAllReservationsFromDb();
         await Reminder();
 
@@ -69,7 +72,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
         if (resource is null)
             return new ReservationResponse(false, $"Resource with id: {reservation.ResourceId} doesn't exist");
 
-        if(!IsResourceAvailable(reservation))
+        if(!await IsResourceAvailable(reservation))
             return new ReservationResponse(false, "Resource is not available in selected period.");
 
         dbReservation.StartTime = reservation.StartTime;
@@ -78,8 +81,9 @@ public class ReservationRespository(DataContext context, IUserContextService use
         dbReservation.Resource =  resource!;
 
         await context.SaveChangesAsync();
+        _isListChanged = true;
 
-        var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation update", $"You have successfully updateds reservation with id {id}");
+        var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation update", $"You have successfully update reservation with id {id}");
 
         await emailSender.SendEmailAsync(message);
 
@@ -102,8 +106,11 @@ public class ReservationRespository(DataContext context, IUserContextService use
         return new ReservationResponse(true);
     }
 
-    private bool IsResourceAvailable(Reservation reservation)
+    private async Task<bool> IsResourceAvailable(Reservation reservation)
     {
+        if (_isListChanged)
+            _reservations = await GetAllReservationsFromDb();
+
         var activeReservations = _reservations
             .Where(r => r.ResourceId == reservation.ResourceId && r.Status == "active")
             .OrderBy(r => r.StartTime)
