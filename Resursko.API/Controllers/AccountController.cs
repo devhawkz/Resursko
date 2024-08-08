@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Resursko.API.Services.Account;
+using Resursko.API.Services.ForgotPasswotdService;
+using Resursko.Domain.DTOs;
 
 namespace Resursko.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AccountController(IAccountService accountService) : ControllerBase
+public class AccountController(IAccountService accountService, IForgotPasswordService passwordService) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<ActionResult<AccountRegistrationResponse>> Register(AccountRegistrationRequest request)
@@ -35,5 +37,33 @@ public class AccountController(IAccountService accountService) : ControllerBase
             return Ok(result);
 
         return Unauthorized(result.ErrorMessage);
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword(ForgotPassword forgotPassword)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Invalid data.");
+
+        var result = await passwordService.ForgotPassword(forgotPassword);
+
+        if (result.isSuccessful)
+            return Ok(result);
+
+        return BadRequest(result);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult<ResetPasswordResponse>> ResetPassword(ResetPassword resetPassword)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Invalid data.");
+
+        var result = await passwordService.ResetPassword(resetPassword);
+
+        if (result.isSuccesfull)
+            return Ok(result);
+
+        return BadRequest(result);
     }
 }
