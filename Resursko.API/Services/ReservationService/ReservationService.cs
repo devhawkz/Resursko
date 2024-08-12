@@ -42,4 +42,14 @@ public class ReservationService(IReservationRespository reservationRespository) 
         var result = await reservationRespository.DeleteReservation(id);
         return result;
     }
+
+    public async Task<List<GetAllReservationResponse>> GetReservationsByCurrentUser()
+    {
+        var result = await reservationRespository.GetReservationsByCurrentUser();
+
+        if (result is null || result.Count == 0)
+            return new List<GetAllReservationResponse>();
+
+        return result;
+    }
 }
