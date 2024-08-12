@@ -1,4 +1,5 @@
-﻿using Resursko.API.Services.EmailService;
+﻿using Microsoft.AspNetCore.Identity;
+using Resursko.API.Services.EmailService;
 using Resursko.API.Services.UserContext;
 using Resursko.Domain.DTOs.ReservationDTO;
 using Resursko.Domain.Models;
@@ -15,6 +16,9 @@ public class ReservationRespository(DataContext context, IUserContextService use
         var userId = userContextService.GetUserId();
         if (userId is null)
             return new ReservationResponse(false, "You must log in to perform this action!");
+
+        if(reservation.StartTime < DateTime.Now)
+            return new ReservationResponse(false, "Start time can not be in the past.");
 
         if (reservation.StartTime > reservation.EndTime)
             return new ReservationResponse(false, "Start time can't be older than end time");
@@ -40,6 +44,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
     {
         _isListChanged = false;
         await GetAllReservationsFromDb();
+        await IsReservationActive();
         await Reminder();
 
         return _reservations
@@ -106,6 +111,26 @@ public class ReservationRespository(DataContext context, IUserContextService use
         return new ReservationResponse(true);
     }
 
+    public async Task<List<GetAllReservationResponse>> GetReservationsByCurrentUser()
+    {
+        var userId = userContextService.GetUserId();
+
+        if (_isListChanged)
+            _reservations = await GetAllReservationsFromDb();
+
+        return _reservations.Where(r => r.UserId == userId)
+            .Select(r => new GetAllReservationResponse
+            {
+                Username = r.User.UserName,
+                Email = r.User.Email,
+                ResourceName = r.Resource.Name,
+                StartTime = r.StartTime,
+                EndTime = r.EndTime,
+                Status = r.Status
+            })
+            .ToList();
+    }
+
     private async Task<bool> IsResourceAvailable(Reservation reservation)
     {
         if (_isListChanged)
@@ -116,10 +141,10 @@ public class ReservationRespository(DataContext context, IUserContextService use
             .OrderBy(r => r.StartTime)
             .ToList();
 
-        foreach(var activeReservation in activeReservations)
+        foreach (var activeReservation in activeReservations)
         {
-            if(reservation.StartTime < activeReservation.EndTime && reservation.EndTime > activeReservation.StartTime)
-                return false;      
+            if (reservation.StartTime < activeReservation.EndTime && reservation.EndTime > activeReservation.StartTime)
+                return false;
         }
 
         return true;
@@ -139,14 +164,14 @@ public class ReservationRespository(DataContext context, IUserContextService use
     {
         var activeReservations = await context.Reservations
             .Include(r => r.User)
-            .Where(r =>  r.Status == "active")
+            .Where(r => r.Status == "active")
             .ToListAsync();
 
         foreach (var reservation in activeReservations)
         {
             TimeSpan difference = reservation.StartTime - DateTime.Now;
 
-           if(difference <= TimeSpan.FromDays(1))
+            if (difference <= TimeSpan.FromDays(1))
             {
                 var message = new Message(new string[] { reservation.User.Email! }, "Reservation reminder", $"You have reservation with id {reservation.Id} that begins in one day");
                 await emailSender.SendEmailAsync(message);
@@ -155,4 +180,20 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
         await context.SaveChangesAsync();
     }
+
+    private async Task IsReservationActive()
+    {
+        foreach(var reservation in _reservations)
+        {
+            if (reservation.Status == "active")
+            {
+                if(reservation.EndTime < DateTime.Now)
+                    reservation.Status = "inactive";
+                
+            }
+        }
+
+        await context.SaveChangesAsync();
+    }
+   
 }

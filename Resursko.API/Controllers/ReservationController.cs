@@ -61,4 +61,14 @@ public class ReservationController(IReservationService reservationService) : Con
 
         return BadRequest(result);
     }
+
+    [HttpGet("reservations-user")]
+    public async Task<ActionResult<List<GetAllReservationResponse>>> GetReservationsByCurrentUser()
+    {
+        var result = await reservationService.GetReservationsByCurrentUser();
+        if (result is not null && result.Count > 0)
+            return Ok(result);
+
+        return NotFound("There is no reservation made by this user in database.");
+    }
 }
