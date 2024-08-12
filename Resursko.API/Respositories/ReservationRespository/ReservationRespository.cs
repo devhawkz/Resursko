@@ -44,6 +44,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
     {
         _isListChanged = false;
         await GetAllReservationsFromDb();
+        await IsReservationActive();
         await Reminder();
 
         return _reservations
@@ -180,5 +181,19 @@ public class ReservationRespository(DataContext context, IUserContextService use
         await context.SaveChangesAsync();
     }
 
+    private async Task IsReservationActive()
+    {
+        foreach(var reservation in _reservations)
+        {
+            if (reservation.Status == "active")
+            {
+                if(reservation.EndTime < DateTime.Now)
+                    reservation.Status = "inactive";
+                
+            }
+        }
+
+        await context.SaveChangesAsync();
+    }
    
 }
