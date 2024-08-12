@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Resursko.API.Services.EmailService;
 using Resursko.API.Services.JwtHandler;
@@ -18,10 +19,11 @@ public class AccountService(UserManager<User> userManager, SignInManager<User> s
             return new AccountLoginResponse(false, ErrorMessage: "An error occurred while trying to sign you in. Please try again!");
 
         var roles = await userManager.GetRolesAsync(user);
-        var jwtToken = jwtService.CreateToken(user, roles);
+        var jwtToken = await jwtService.CreateToken(user, roles, true);
 
-        return new AccountLoginResponse(true, Token: jwtToken);
+        return new AccountLoginResponse(true, Token: jwtToken, RefreshToken: user.RefreshToken!);
     }
+
     public async Task<AccountRegistrationResponse> RegisterAsync(AccountRegistrationRequest request)
     {
         var newUser = serviceHelper.GetUser(request); 
@@ -44,5 +46,17 @@ public class AccountService(UserManager<User> userManager, SignInManager<User> s
         return new AccountRegistrationResponse(true);
     }
 
-    
+
+    public async Task<TokenRefreshRequest> RefreshToken(TokenRefreshRequest request)
+    {
+        var principal = jwtService.GetClaimsPrincipalFromExpiredToken(request.AccessToken);
+        var user = await userManager.FindByNameAsync(principal.Identity!.Name!);
+        if (user is null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            return new TokenRefreshRequest(null!, null!);
+
+        var roles = await userManager.GetRolesAsync(user);
+        var token = await jwtService.CreateToken(user, roles, false);
+        return new TokenRefreshRequest(AccessToken: token, RefreshToken: user.RefreshToken);
+    }
+
 }

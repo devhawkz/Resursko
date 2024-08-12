@@ -1,11 +1,14 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Resursko.API.Services.JwtHandler;
 
-public class JwtService(IConfiguration configuration)
+public class JwtService(IConfiguration configuration, UserManager<User> userManager)
 {
     private readonly IConfigurationSection _jwtSettings = configuration.GetSection("JwtSettings");
     private List<Claim> GetUserClaims(User user, IList<string> roles)
@@ -37,17 +40,63 @@ public class JwtService(IConfiguration configuration)
             issuer: _jwtSettings["JwtIssuer"],
             audience: _jwtSettings["JwtAudience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings["JwtExpiryInMinutes"])),
+            expires: DateTime.Now.AddMinutes(Convert.ToInt32(_jwtSettings["JwtExpiryInMinutes"])),
             signingCredentials: creds
             );
     }
+    private string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[32];
+        using(var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+    }
 
-    public string CreateToken(User user, IList<string> roles)
+    internal ClaimsPrincipal GetClaimsPrincipalFromExpiredToken(string token)
+    {
+        var tokenValidationParamteters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidAudience = _jwtSettings["JwtAudience"],
+            ValidIssuer = _jwtSettings["JwtIssuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings["JwtSecurityKey"]!)),
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        SecurityToken securityToken;
+
+        var principal = tokenHandler.ValidateToken(token, tokenValidationParamteters, out securityToken);
+        var jwtSecurityToken = securityToken as JwtSecurityToken;
+
+        if (jwtSecurityToken is null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            throw new SecurityTokenException("Invalid token");  
+
+        return principal;
+    }
+    public async Task<string> CreateToken(User user, IList<string> roles, bool populateExp)
     {
         var claims = GetUserClaims(user, roles);
         var creds = GetUserCredentials();
-        var token = GenerateTokenOptions(creds, claims);
-        
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var tokenOptions = GenerateTokenOptions(creds, claims);
+
+        var refreshToken = GenerateRefreshToken();
+
+        user.RefreshToken = refreshToken;
+
+        if (populateExp)
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+
+        await userManager.UpdateAsync(user);
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+        return accessToken;
     }
+
+
 }

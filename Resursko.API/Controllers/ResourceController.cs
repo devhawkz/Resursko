@@ -24,7 +24,7 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
 
         return BadRequest(result.ErrorMessage);
     }
-
+    [Authorize(Roles = "Admin, User")]
     [HttpGet]
     public async Task<ActionResult<List<Resource>>> GetAllResources()
     {

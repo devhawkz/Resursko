@@ -85,7 +85,7 @@ namespace Resursko.API
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<AccountServiceHelper>();
-            builder.Services.AddSingleton<JwtService>();
+            builder.Services.AddScoped<JwtService>();
             builder.Services.AddScoped<IResourceRespository, ResourceRespository>();
             builder.Services.AddScoped<IServiceResoruce, ServiceResource>();
             builder.Services.AddScoped<IReservationRespository, ReservationRespository>();

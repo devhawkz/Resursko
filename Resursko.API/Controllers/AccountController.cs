@@ -66,4 +66,14 @@ public class AccountController(IAccountService accountService, IForgotPasswordSe
 
         return BadRequest(result);
     }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<TokenRefreshRequest>> RefreshToken(TokenRefreshRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Invalid token");
+        var result = await accountService.RefreshToken(request);
+
+        return Ok(result);
+    }
 }
