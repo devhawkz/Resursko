@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Resursko.Domain\Resursko.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\" />
+  </ItemGroup>
+
 </Project>
