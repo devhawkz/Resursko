@@ -11,10 +11,10 @@ namespace Resursko.API.Controllers;
 [ApiController]
 public class AccountController(IAccountService accountService, IForgotPasswordService passwordService) : ControllerBase
 {
-    [HttpPost("register")]
+    [HttpPost("registration")]
     public async Task<ActionResult<AccountRegistrationResponse>> Register(AccountRegistrationRequest request)
     {
-        if(!ModelState.IsValid)
+        if(!ModelState.IsValid || request is null)
             return BadRequest("Invalid data entered");
 
         var result = await accountService.RegisterAsync(request);
