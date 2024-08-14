@@ -21,6 +21,7 @@ namespace Resursko.Client
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
            
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<RefreshTokenService>();
             
             await builder.Build().RunAsync();
         }

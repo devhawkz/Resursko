@@ -40,7 +40,7 @@ public class JwtService(IConfiguration configuration, UserManager<User> userMana
             issuer: _jwtSettings["JwtIssuer"],
             audience: _jwtSettings["JwtAudience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToInt32(_jwtSettings["JwtExpiryInMinutes"])),
+            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings["JwtExpiryInMinutes"])),
             signingCredentials: creds
             );
     }
@@ -60,7 +60,7 @@ public class JwtService(IConfiguration configuration, UserManager<User> userMana
         {
             ValidateAudience = true,
             ValidateIssuer = true,
-            ValidateLifetime = true,
+            ValidateLifetime = false,
             ValidateIssuerSigningKey = true,
 
             ValidAudience = _jwtSettings["JwtAudience"],

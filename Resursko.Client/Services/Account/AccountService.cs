@@ -50,6 +50,8 @@ namespace Resursko.Client.Services.Account
                 return result!;
 
             await _localStorage.SetItemAsync("authToken", result!.Token);
+            await _localStorage.SetItemAsync("refreshToken", result!.RefreshToken);
+
             ((AuthStateProvider)_authStateProvider).NotifyUserAuthentication(result!.Token);
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Token);
 
@@ -59,9 +61,32 @@ namespace Resursko.Client.Services.Account
         public async Task Logout()
         {
             await _localStorage.RemoveItemAsync("authToken");
+            await _localStorage.RemoveItemAsync("refreshToken");
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _httpClient.DefaultRequestHeaders.Authorization = null;
         }
 
+        public async Task<string> RefreshToken()
+        {
+            var token = await _localStorage.GetItemAsync<string>("authToken");
+            var refreshToken = await _localStorage.GetItemAsync<string>("refreshToken");
+
+            var tokenDto = JsonSerializer.Serialize(new TokenRefreshRequest (token!, refreshToken!));
+            var bodyContent = new StringContent(tokenDto, Encoding.UTF8, "application/json");
+
+            var refreshResult = await _httpClient.PostAsync("api/account/refresh", bodyContent);
+            var refreshContent = await refreshResult.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<TokenRefreshRequest>(refreshContent, _jsonSerializerOptions);
+
+            if (!refreshResult.IsSuccessStatusCode)
+                throw new ApplicationException("Something went wrong during the refresh token action");
+
+            await _localStorage.SetItemAsync("authToken", result!.AccessToken);
+            await _localStorage.SetItemAsync("refreshToken", result!.RefreshToken);
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result!.AccessToken);
+
+            return result!.AccessToken;
+        }
     }
 }
