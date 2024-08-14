@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
+using Resursko.Client.Services.Account;
 
-namespace Resursko.Client.Services.Account;
+namespace Resursko.Client.Respositories.HttpRespository;
 
 public class RefreshTokenService(IAccountService accountService, AuthenticationStateProvider authStateProvider)
 {
