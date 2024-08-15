@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Resursko.Client.AuthProviders;
 using Resursko.Client.Respositories.HttpRespository;
 using Resursko.Client.Services.Account;
+using Resursko.Client.Services.Administrator;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace Resursko.Client
@@ -28,6 +29,7 @@ namespace Resursko.Client
             builder.Services.AddScoped<HttpInterceptorService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<RefreshTokenService>();
+            builder.Services.AddScoped<IAdminService, AdminService>();
             
             await builder.Build().RunAsync();
         }
