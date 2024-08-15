@@ -6,6 +6,7 @@ using Resursko.Client.AuthProviders;
 using Resursko.Client.Respositories.HttpRespository;
 using Resursko.Client.Services.Account;
 using Resursko.Client.Services.Administrator;
+using Resursko.Client.Services.ResourceServices;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace Resursko.Client
@@ -30,6 +31,7 @@ namespace Resursko.Client
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<RefreshTokenService>();
             builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IResourceService, ResourceService>();
             
             await builder.Build().RunAsync();
         }
