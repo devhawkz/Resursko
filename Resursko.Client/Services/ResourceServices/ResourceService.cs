@@ -45,9 +45,23 @@ public class ResourceService : IResourceService
         return JsonSerializer.Deserialize<List<GetResourcesDTO>>(content, _jsonSerializerOptions)!;
     }
 
+    public async Task<ResourceResponse> UpdateResource(ResourceRequest request, int id)
+    {
+        var content = JsonSerializer.Serialize(request);
+        var contentBody = new StringContent(content, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PutAsync($"api/resource/{id}", contentBody);
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+            return JsonSerializer.Deserialize<ResourceResponse>(responseContent, _jsonSerializerOptions)!;
+
+        return new ResourceResponse(true);
+    }
+
     public async Task<ResourceResponse> DeleteResource(int id)
     {
-        var response = await _httpClient.DeleteAsync($"api/resources/{id}");
+        var response = await _httpClient.DeleteAsync($"api/resource/{id}");
         var responseContent = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)

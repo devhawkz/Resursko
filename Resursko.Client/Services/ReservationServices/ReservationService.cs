@@ -44,6 +44,20 @@ namespace Resursko.Client.Services.ReservationServices
             return JsonSerializer.Deserialize<List<GetAllReservationResponse>>(responseContent, _jsonSerializerOptions)!;
         }
 
+        public async Task<ReservationResponse> UpdateReservation(ReservationRequest request, int id)
+        {
+            var content = JsonSerializer.Serialize(request);
+            var contentBody = new StringContent(content, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PutAsync($"api/reservation/{id}", contentBody);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                return JsonSerializer.Deserialize<ReservationResponse>(responseContent, _jsonSerializerOptions)!;
+
+            return new ReservationResponse(true);
+
+        }
         public async Task<ReservationResponse> DeleteReservation(int id)
         {
             var response = await _httpClient.DeleteAsync($"api/reservation/{id}");
