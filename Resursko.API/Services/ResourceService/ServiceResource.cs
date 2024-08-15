@@ -16,11 +16,11 @@ public class ServiceResource(IResourceRespository resourceRespository) : IServic
         return result;
     }
 
-    public async Task<List<Resource>> GetAllResources()
+    public async Task<List<GetResourcesDTO>> GetAllResources()
     {
         var result = await resourceRespository.GetAllResources();
         if (result is null || result.Count == 0)
-            return new List<Resource>();
+            return new List<GetResourcesDTO>();
 
         return result;
     }

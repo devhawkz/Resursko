@@ -16,7 +16,12 @@ public class ResourceRespository(DataContext context) : IResourceRespository
         return result;
     }
 
-    public async Task<List<Resource>> GetAllResources() => await context.Resources.ToListAsync();
+    public async Task<List<GetResourcesDTO>> GetAllResources()
+    {
+        return await context.Resources
+            .Select(r => new GetResourcesDTO(r.Name!, r.Description!))
+            .ToListAsync();
+    }
 
     public async Task<ResourceResponse> UpdateResource(Resource resource, int id)
     {
@@ -48,6 +53,7 @@ public class ResourceRespository(DataContext context) : IResourceRespository
     private async Task<ResourceResponse> CheckNameInDatabase(string name)
     {
         var resource = await context.Resources.FirstOrDefaultAsync(r => r.Name == name);
-        return resource is null? new ResourceResponse(true) : new ResourceResponse(false, $"Resource with name {name} already exists in database");
+        return resource is null ? new ResourceResponse(true) : new ResourceResponse(false, $"Resource with name {name} already exists in database");
     }
-}
+
+}    

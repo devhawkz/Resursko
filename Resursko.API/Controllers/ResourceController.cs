@@ -26,7 +26,7 @@ public class ResourceController(IServiceResoruce serviceResoruce) : ControllerBa
     }
     [Authorize(Roles = "Admin, User")]
     [HttpGet]
-    public async Task<ActionResult<List<Resource>>> GetAllResources()
+    public async Task<ActionResult<List<GetResourcesDTO>>> GetAllResources()
     {
         var result = await serviceResoruce.GetAllResources();
 
