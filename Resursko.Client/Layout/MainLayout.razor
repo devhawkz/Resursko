@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="MyCustomTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudDialogProvider />
@@ -8,6 +8,11 @@
 <MudLayout>
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle"></MudIconButton>
+        <MudSpacer />
+
+        <MudToggleIconButton @bind-Toggled="_isDarkMode"
+                             Icon="@Icons.Material.Filled.DarkMode" Color="Color.Default"
+                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="Color.Default" />
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen" Elevation="25" ClipMode="DrawerClipMode.Docked" Breakpoint="Breakpoint.LgAndDown">
         <MudDrawerHeader>
@@ -28,9 +33,27 @@
 
 @code{
     private bool _drawerOpen = false;
+    private bool _isDarkMode;
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen; 
     }
+
+    MudTheme MyCustomTheme = new MudTheme()
+        {
+            PaletteLight = new PaletteLight()
+            {
+                Primary = Colors.DeepPurple.Darken2,
+                Secondary = Colors.Green.Accent4,
+                AppbarBackground = Colors.Green.Lighten1
+            },
+
+            PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Blue.Darken4,
+                Secondary = Colors.Green.Accent4,
+                AppbarBackground = Colors.Gray.Darken4
+            }
+        };
 }
