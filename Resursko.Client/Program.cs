@@ -2,6 +2,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor.Services;
 using Resursko.Client.AuthProviders;
 using Resursko.Client.Respositories.HttpRespository;
 using Resursko.Client.Services.Account;
@@ -27,6 +28,8 @@ namespace Resursko.Client
             builder.Services.AddHttpClientInterceptor();
             builder.Services.AddAuthorizationCore();
             builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddMudServices();
+
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
             builder.Services.AddScoped<HttpInterceptorService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
@@ -34,6 +37,7 @@ namespace Resursko.Client
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IResourceService, ResourceService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            
 
             await builder.Build().RunAsync();
         }
