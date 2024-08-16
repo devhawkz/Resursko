@@ -4,5 +4,5 @@ namespace Resursko.Client.Services.Administrator;
 
 public interface IAdminService
 {
-    Task<AccountRegistrationResponse> RegisterAdmin(AccountRegistrationRequest request); 
+    Task<AccountRegistrationResponse> RegisterAdmin(AccountRegistrationRequest request);
 }

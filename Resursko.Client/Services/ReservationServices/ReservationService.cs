@@ -32,7 +32,6 @@ namespace Resursko.Client.Services.ReservationServices
 
             return new ReservationResponse(true);
         }
-
         public async Task<List<GetAllReservationResponse>> GetAllReservations()
         {
             var response = await _httpClient.GetAsync("api/reservation");
@@ -43,7 +42,6 @@ namespace Resursko.Client.Services.ReservationServices
 
             return JsonSerializer.Deserialize<List<GetAllReservationResponse>>(responseContent, _jsonSerializerOptions)!;
         }
-
         public async Task<ReservationResponse> UpdateReservation(ReservationRequest request, int id)
         {
             var content = JsonSerializer.Serialize(request);

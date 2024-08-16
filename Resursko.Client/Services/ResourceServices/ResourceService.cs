@@ -19,7 +19,6 @@ public class ResourceService : IResourceService
         _authStateProvider = authStateProvider;
         _localStorage = localStorage;
     }
-
     public async Task<ResourceResponse> CreateResource(ResourceRequest request)
     {
         var content = JsonSerializer.Serialize(request);
@@ -33,7 +32,6 @@ public class ResourceService : IResourceService
 
         return new ResourceResponse(true);
     }
-
     public async Task<List<GetResourcesDTO>> GetAllResources()
     {
         var response = await _httpClient.GetAsync("api/resource");
@@ -44,7 +42,6 @@ public class ResourceService : IResourceService
 
         return JsonSerializer.Deserialize<List<GetResourcesDTO>>(content, _jsonSerializerOptions)!;
     }
-
     public async Task<ResourceResponse> UpdateResource(ResourceRequest request, int id)
     {
         var content = JsonSerializer.Serialize(request);
@@ -58,7 +55,6 @@ public class ResourceService : IResourceService
 
         return new ResourceResponse(true);
     }
-
     public async Task<ResourceResponse> DeleteResource(int id)
     {
         var response = await _httpClient.DeleteAsync($"api/resource/{id}");

@@ -17,6 +17,8 @@ using Resursko.API.Services.UserContext;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Resursko.API.Services.ForgotPasswotdService;
+using Resursko.API.Respositories.UsersRespository;
+using Resursko.API.Services.UsersServices;
 namespace Resursko.API
 {
     public class Program
@@ -92,7 +94,8 @@ namespace Resursko.API
             builder.Services.AddScoped<IReservationService, ReservationService>();
             builder.Services.AddScoped<IUserContextService, UserContextService>();
             builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
-           
+            builder.Services.AddScoped<IUsersRespository, UsersRespository>();
+            builder.Services.AddScoped<IUserService, UserService>();
             
             var app = builder.Build();
 
