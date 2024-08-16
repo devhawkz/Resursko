@@ -2,43 +2,52 @@
 @using Resursko.Domain.DTOs.Account
 @inject NavigationManager NavManager;
 
-<h3>Login</h3>
+
 @if (ShowAuthError)
 {
     <div class="alert alert-danger" role="alert">
         <p>@Error</p>
     </div>
 }
-<EditForm Model="_loginRequest" OnValidSubmit="ExecuteLogin" class="card card-body bg-light mt-5">
-    <DataAnnotationsValidator />
-    <div class="form-group row">
-        <label for="email" class="col-md-2 col-form-label">Email:</label>
-        <div class="col-md-10">
-            <InputText id="email" class="form-control" @bind-Value="_loginRequest.Email" />
-            <ValidationMessage For="@(() => _loginRequest.Email)" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="password" class="col-md-2 col-form-label">Password:</label>
-        <div class="col-md-10">
-            <InputText type="password" id="password" class="form-control" @bind-Value="_loginRequest.Password" />
-            <ValidationMessage For="@(() => _loginRequest.Password)" />
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12 text-right">
-            <button type="submit" class="btn btn-success">Login</button>
-        </div>
-    </div>
-</EditForm>
+<section style="width:600px; margin: 0 auto;">
+    <EditForm Model="_loginRequest" OnValidSubmit="ExecuteLogin">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Email" @bind-Value="_loginRequest.Email"
+                              For="@(() => _loginRequest.Email)" />
+
+                <MudTextField Label="Password" @bind-Value="_loginRequest.Password"
+                              For="@(() => _loginRequest.Password)" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Disabled ="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                    @if(_processing)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Processing</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="ms-2">Login</MudText>
+                    }
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</section>
+
 
 @code {
     private AccountLoginRequest _loginRequest = new AccountLoginRequest();
     public bool ShowAuthError { get; set; }
-    public string Error { get; set; }
+    private string? Error { get; set; }
+    private bool _processing = false;
+
     public async Task ExecuteLogin()
     {
         ShowAuthError = false;
+        _processing = true;
         var result = await AccountService.Login(_loginRequest);
         if (!result.IsSuccessful)
         {
