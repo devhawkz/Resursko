@@ -1,8 +1,6 @@
-﻿using Resursko.Domain.DTOs.Account;
+﻿namespace Resursko.API.Services.UsersServices;
 
-namespace Resursko.Client.Services.UsersService;
-
-public interface IUserService
+public interface IUserServiceAPI
 {
     Task<List<GetAllUsersResponse>> GetAllUsers();
     Task<AccountResponse> UpdateUserInfo(UpdateUsersInfoRequest request);

@@ -95,7 +95,7 @@ namespace Resursko.API
             builder.Services.AddScoped<IUserContextService, UserContextService>();
             builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
             builder.Services.AddScoped<IUsersRespository, UsersRespository>();
-            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IUserServiceAPI, UserServiceAPI>();
             
             var app = builder.Build();
 

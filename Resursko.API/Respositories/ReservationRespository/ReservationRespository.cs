@@ -42,8 +42,9 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
     public async Task<List<GetAllReservationResponse>> GetAllReservations()
     {
-        _isListChanged = false;
-        await GetAllReservationsFromDb();
+        if(_isListChanged || _reservations.Count == 0)
+            await GetAllReservationsFromDb();
+        
         await IsReservationActive();
         await Reminder();
 
@@ -107,7 +108,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
 
         var message = new Message(new string[] { userContextService.GetUserEmail()! }, "Reservation canceled", $"You have successfully canceled reservation with id {reservation.Id}");
         await emailSender.SendEmailAsync(message);
-
+        _isListChanged = true;
         return new ReservationResponse(true);
     }
 

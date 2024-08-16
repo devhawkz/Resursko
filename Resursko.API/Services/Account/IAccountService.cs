@@ -6,6 +6,5 @@ public interface IAccountService
 {
     Task<AccountRegistrationResponse> RegisterAsync(AccountRegistrationRequest request);
     Task<AccountLoginResponse> LoginAsync(AccountLoginRequest request);
-
     Task<TokenRefreshRequest> RefreshToken(TokenRefreshRequest request);
 }

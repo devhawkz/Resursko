@@ -8,7 +8,7 @@ namespace Resursko.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdministratorController(IAdminService adminService, IUserService userService) : ControllerBase
+    public class AdministratorController(IAdminService adminService, IUserServiceAPI userService) : ControllerBase
     {
         [HttpPost]
         public async Task<ActionResult<AccountRegistrationResponse>> RegisterAdministrator(AccountRegistrationRequest request)

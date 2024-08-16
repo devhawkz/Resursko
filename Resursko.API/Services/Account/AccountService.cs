@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Mapster;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Resursko.API.Services.EmailService;
 using Resursko.API.Services.JwtHandler;
+using Resursko.API.Services.UserContext;
 
 namespace Resursko.API.Services.Account;
-public class AccountService(UserManager<User> userManager, SignInManager<User> signInManager, JwtService jwtService, AccountServiceHelper serviceHelper, IEmailSenderAsync emailSender) : IAccountService
+public class AccountService(UserManager<User> userManager, SignInManager<User> signInManager, JwtService jwtService, AccountServiceHelper serviceHelper, IEmailSenderAsync 
+emailSender) : IAccountService
 {
     private const string _roleName = "user"; 
     public async Task<AccountLoginResponse> LoginAsync(AccountLoginRequest request)
@@ -58,5 +61,4 @@ public class AccountService(UserManager<User> userManager, SignInManager<User> s
         var token = await jwtService.CreateToken(user, roles, false);
         return new TokenRefreshRequest(AccessToken: token, RefreshToken: user.RefreshToken);
     }
-
 }
