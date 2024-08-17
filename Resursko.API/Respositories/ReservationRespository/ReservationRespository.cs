@@ -51,6 +51,7 @@ public class ReservationRespository(DataContext context, IUserContextService use
         return _reservations
              .Select(r => new GetAllReservationResponse
              {
+                 Id = r.Id,
                  Username = r.User.UserName,
                  Email = r.User.Email,
                  ResourceName = r.Resource.Name,

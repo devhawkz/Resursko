@@ -1,11 +1,11 @@
-﻿@page "/resources"
+﻿@page "/reservations"
 
-@using Resursko.Client.Services.ResourceServices
-@using Resursko.Domain.DTOs.ResourceDTO
+@using Resursko.Client.Services.ReservationServices
+@using Resursko.Domain.DTOs.ReservationDTO
 @using Resursko.Client.Pages.Shared;
 
 @implements IDisposable
-@inject IResourceService ResourceService; 
+@inject IReservationService ReservationService;
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IDialogService DialogService;
 
@@ -13,33 +13,41 @@
     <Authorized>
         <MudTable Items="@Elements" Hover="true" Striped="true" Bordered="true">
             <ToolBarContent>
-                <MudText Typo="Typo.h6">Company resource table</MudText>
+                <MudText Typo="Typo.h6">Company reservation table</MudText>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>Id</MudTh>
-                <MudTh>Name</MudTh>
-                <MudTh>Description</MudTh>
+                <MudTh>Username</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Resource name</MudTh>
+                <MudTh>Start time</MudTh>
+                <MudTh>End time</MudTh>
+                <MudTh>Status</MudTh>
                 @if (isAdmin)
                 {
-                    <MudTh>Action</MudTh>    
+                    <MudTh>Action</MudTh>
                 }
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="Name">@context.Name</MudTd>
-                <MudTd DataLabel="Description">@context.Description</MudTd>
+                <MudTd DataLabel="Name">@context.Username</MudTd>
+                <MudTd DataLabel="Description">@context.Email</MudTd>
+                <MudTd DataLabel="Resource Name">@context.ResourceName</MudTd>
+                <MudTd DataLabel="Start time">@context.StartTime</MudTd>
+                <MudTd DataLabel="End time">@context.EndTime</MudTd>
+                <MudTd DataLabel="Status">@context.Status</MudTd>
                 @if (isAdmin)
                 {
                     <MudTd DataLabel="Action">
-                        <MudButton @onclick="() => UpdateResource()" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
-                        <MudButton @onclick="async () => await DeleteResource(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete"/>
+                        <MudButton @onclick="() => UpdateReservation()" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                        <MudButton @onclick="async () => await DeleteReservation(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
                     </MudTd>
                 }
             </RowTemplate>
         </MudTable>
         @if (isAdmin)
         {
-            <MudButton @onclick="() => CreateResource()" Color="Color.Info" StartIcon="@Icons.Material.Filled.AddCircle" />
+            <MudButton @onclick="() => CreateReservation()" Color="Color.Info" StartIcon="@Icons.Material.Filled.AddCircle" />
         }
     </Authorized>
     <NotAuthorized>
@@ -50,34 +58,34 @@
 </AuthorizeView>
 
 @code {
-    private static List<GetResourcesDTO> Elements = new List<GetResourcesDTO>();
+    private static List<GetAllReservationResponse> Elements = new List<GetAllReservationResponse>();
     private bool isAdmin;
 
     protected override async Task OnInitializedAsync()
     {
-       
+
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         //Interceptor.RegisterEvent();
 
-        Elements = await ResourceService.GetAllResources();
+        Elements = await ReservationService.GetAllReservations();
 
         if (user.Identity!.IsAuthenticated)
             isAdmin = user.IsInRole("Admin");
     }
 
-    void CreateResource() => NavManager.NavigateTo("/create-resource");
-    void UpdateResource() => NavManager.NavigateTo("/update-resource");
+    void CreateReservation() => NavManager.NavigateTo("/create-reservation");
+    void UpdateReservation() => NavManager.NavigateTo("/update-resource");
 
-    async Task DeleteResource(int id)
+    async Task DeleteReservation(int id)
     {
         var toDelete = await ExecuteDialog();
 
         if (toDelete)
-        { 
-            var result = await ResourceService.DeleteResource(id);
-            if(result.IsSuccessful)
-                await ResourceService.GetAllResources();
+        {
+            var result = await ReservationService.DeleteReservation(id);
+            if (result.IsSuccessful)
+                NavManager.NavigateTo("/reservations", forceLoad: true);
 
         }
     }
@@ -97,7 +105,7 @@
                 MaxWidth = MaxWidth.ExtraSmall
             };
 
-        var dialog = await DialogService.ShowAsync<DialogNotificationComponent> ("Delete", parameters, options);
+        var dialog = await DialogService.ShowAsync<DialogNotificationComponent>("Delete", parameters, options);
         var result = await dialog.Result;
 
         if (!result!.Canceled)

@@ -7,7 +7,7 @@ public class ReservationRequest
     [Required]
     public int ResourceId { get; set; }
     [Required, DataType(DataType.DateTime)]
-    public DateTime StartTime { get; set; }
+    public DateTime? StartTime { get; set; }
     [Required, DataType(DataType.DateTime)]
-    public DateTime EndTime { get; set; }
+    public DateTime? EndTime { get; set; }
 }

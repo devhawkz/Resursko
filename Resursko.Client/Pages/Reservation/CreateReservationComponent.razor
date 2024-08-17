@@ -1,0 +1,109 @@
+﻿@page "/create-reservation"
+
+@using Resursko.Client.Services.ReservationServices
+@using Resursko.Domain.DTOs.ReservationDTO
+@using Resursko.Client.Services.ResourceServices
+@using Resursko.Domain.DTOs.ResourceDTO
+
+@inject AuthenticationStateProvider AuthStateProvider;
+@inject IReservationService ReservationService;
+@inject IResourceService ResourceService;
+
+<AuthorizeView Context="authContext">
+    <Authorized>
+        @if (_isAdmin)
+        {
+            <section style="width:600px; margin: 0 auto;">
+                <EditForm Model="_reservation" OnValidSubmit="CreateReservation">
+                    <DataAnnotationsValidator />
+                    <MudCard>
+                      <MudCardContent>
+                            <MudSelect @bind-Value="@_reservation.ResourceId" Label="Select resource" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary" Placeholder="Select resource">
+                                @if (_resources is not null)
+                                {
+                                    @foreach (var resource in _resources)
+                                    {
+                                        <MudSelectItem Value="@resource.Id">@resource.Name</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
+                            <MudDatePicker Label="Start time" Editable="true" @bind-Date="_startDate" />
+                            <MudTimePicker Label="24 hours" @bind-Time="_startTime" />
+                            <MudDatePicker Label="End time" Editable="true" @bind-Date="_endDate" />
+                            <MudTimePicker Label="24 hours" @bind-Time="_endTime" />
+                            @{
+                                _reservation.StartTime = _startDate + _startTime;
+                                _reservation.EndTime = _endDate + _endTime;
+                            }
+                      </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                                @if (_processing)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                    <MudText Class="ms-2">Processing</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Class="ms-2">Create reservation</MudText>
+                                }
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </EditForm>
+            </section>
+        }
+        else
+        {
+            <MudText Typo="Typo.h5">You don't have permission to perform this action!</MudText>
+        }
+    </Authorized>
+    <NotAuthorized>
+        Please <MudLink Href="login" Typo="Typo.h5">login</MudLink> to perform this action!
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    private ReservationRequest _reservation = new ReservationRequest();
+    private bool _processing = false;
+    private string? ErrorMessage;
+    private bool _isAdmin;
+    private List<GetResourcesDTO> _resources = new List<GetResourcesDTO>();
+    private DateTime? _startDate;
+    private DateTime? _endDate;
+    private TimeSpan? _startTime;
+    private TimeSpan? _endTime;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity!.IsAuthenticated)
+        {
+            _isAdmin = user.IsInRole("Admin");
+            _resources = await ResourceService.GetAllResources();
+        }
+    }
+
+    public async Task CreateReservation()
+    {
+
+        _processing = true;
+        var result = await ReservationService.CreateNewReservation(_reservation);
+        if (!result.IsSuccessful)
+        {
+            ErrorMessage = result.ErrorMessage;
+        }
+        else
+        {
+            NavManager.NavigateTo("/reservations");
+        }
+
+        _processing = false;
+    }
+
+   
+}
