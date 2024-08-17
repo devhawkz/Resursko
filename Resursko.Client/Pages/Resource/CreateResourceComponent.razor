@@ -1,0 +1,62 @@
+﻿@page "/create-resource"
+
+@using Resursko.Client.Services.ResourceServices
+@using Resursko.Domain.DTOs.ResourceDTO
+
+@inject IResourceService ResourceService;
+@implements IDisposable
+
+<section style="width:600px; margin: 0 auto;">
+    <EditForm Model="_resource" OnValidSubmit="CreateResource">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Name" @bind-Value="_resource.Name"
+                              For="@(() => _resource.Name)" />
+
+                <MudTextField Label="Description" @bind-Value="_resource.Description"
+                              Multiline="true" Rows="5" For="@(() => _resource.Description)" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                    @if (_processing)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Processing</MudText>
+                    }
+                    else
+                    {
+                        <MudText Class="ms-2">Create</MudText>
+                    }
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</section>
+
+@code {
+    private ResourceRequest _resource = new ResourceRequest();
+    private bool _processing = false;
+    private string? ErrorMessage;
+
+    protected void OnInitialized()
+    {
+        //Interceptor.RegisterEvent();
+    }
+
+    public async Task CreateResource()
+    {
+        _processing = true;
+        var result = await ResourceService.CreateResource(_resource);
+        if (!result.IsSuccessful)
+        {
+            ErrorMessage = result.ErrorMessage;
+        }
+        else
+        {
+            NavManager.NavigateTo("/resources");
+        }
+    }
+
+    public void Dispose() => Interceptor.DisposeEvent();
+}

@@ -9,9 +9,12 @@
 @using Resursko.Client
 @using Resursko.Client.Layout
 @using Microsoft.AspNetCore.Components.Authorization;
+@using Resursko.Client.Respositories.HttpRespository
 @using Resursko.Client.Services.Account
 @using Resursko.Client.Services.Administrator
 @using MudBlazor;
 
 @inject IAccountService AccountService;
 @inject IAdminService AdminService;
+@inject NavigationManager NavManager;
+@inject HttpInterceptorService Interceptor;

@@ -21,19 +21,19 @@
                 <MudTextField Label="First Name" @bind-Value="_registrationRequest.FirstName"
                               For="@(() => _registrationRequest.FirstName)" />
 
-                <MudTextField Label="last Name" @bind-Value="_registrationRequest.LastName"
+                <MudTextField Label="Last Name" @bind-Value="_registrationRequest.LastName"
                               For="@(() => _registrationRequest.LastName)" />
 
                 <MudTextField Label="Username" @bind-Value="_registrationRequest.Username"
                               For="@(() => _registrationRequest.Username)" />
 
-                <MudTextField Label="Email" @bind-Value="_registrationRequest.Email"
+                <MudTextField InputType="InputType.Email" Label="Email" @bind-Value="_registrationRequest.Email"
                               For="@(() => _registrationRequest.Email)" />
 
-                <MudTextField Label="Password" @bind-Value="_registrationRequest.Password"
+                <MudTextField InputType="InputType.Password" Label="Password" @bind-Value="_registrationRequest.Password"
                               For="@(() => _registrationRequest.Password)" />
                 
-                <MudTextField Label="Confirm Password" @bind-Value="_registrationRequest.ConfirmPassword"
+                <MudTextField InputType="InputType.Password" Label="Confirm Password" @bind-Value="_registrationRequest.ConfirmPassword"
                               For="@(() => _registrationRequest.ConfirmPassword)" />
             </MudCardContent>
             <MudCardActions>

@@ -1,0 +1,111 @@
+﻿@page "/resources"
+
+@using Resursko.Client.Services.ResourceServices
+@using Resursko.Domain.DTOs.ResourceDTO
+@using Resursko.Client.Pages.Shared;
+
+@implements IDisposable
+@inject IResourceService ResourceService; 
+@inject AuthenticationStateProvider AuthStateProvider;
+@inject IDialogService DialogService;
+
+<AuthorizeView Context="authContext">
+    <Authorized>
+        <MudTable Items="@Elements" Hover="true" Striped="true" Bordered="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Company resource table</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>Description</MudTh>
+                @if (isAdmin)
+                {
+                    <MudTh>Action</MudTh>    
+                }
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
+                @if (isAdmin)
+                {
+                    <MudTd DataLabel="Action">
+                        <MudButton @onclick="() => UpdateResource()" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                        <MudButton @onclick="async () => await DeleteResource(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete"/>
+                    </MudTd>
+                }
+            </RowTemplate>
+        </MudTable>
+        @if (isAdmin)
+        {
+            <MudButton @onclick="() => CreateResource()" Color="Color.Info" StartIcon="@Icons.Material.Filled.AddCircle" />
+        }
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h5">
+            Please <MudLink Href="login" Typo="Typo.h5">login</MudLink> to perform this action!
+        </MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private static List<GetResourcesDTO> Elements = new List<GetResourcesDTO>();
+    private bool isAdmin;
+    private string? ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+       
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        //Interceptor.RegisterEvent();
+
+        Elements = await ResourceService.GetAllResources();
+
+        if (user.Identity!.IsAuthenticated)
+            isAdmin = user.IsInRole("Admin");
+    }
+
+    void CreateResource() => NavManager.NavigateTo("/create-resource");
+    void UpdateResource() => NavManager.NavigateTo("/update-resource");
+
+    async Task DeleteResource(int id)
+    {
+        var toDelete = await ExecuteDialog();
+
+        if (toDelete)
+        { 
+            var result = await ResourceService.DeleteResource(id);
+            if(result.IsSuccessful)
+                await ResourceService.GetAllResources();
+
+        }
+    }
+
+    private async Task<bool> ExecuteDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            {"ContentText", "Are you sure you want to remove this item?"},
+            {"ButtonText", "Yes"},
+            {"Color", Color.Error }
+        };
+
+        var options = new DialogOptions()
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.ExtraSmall
+            };
+
+        var dialog = await DialogService.ShowAsync<DialogNotificationComponent> ("Delete", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result!.Canceled)
+            return true;
+
+        return false;
+    }
+
+    public void Dispose() => Interceptor.DisposeEvent();
+}

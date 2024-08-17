@@ -19,7 +19,7 @@ public class ResourceRespository(DataContext context) : IResourceRespository
     public async Task<List<GetResourcesDTO>> GetAllResources()
     {
         return await context.Resources
-            .Select(r => new GetResourcesDTO(r.Name!, r.Description!))
+            .Select(r => new GetResourcesDTO(r.Id, r.Name!, r.Description!))
             .ToListAsync();
     }
 

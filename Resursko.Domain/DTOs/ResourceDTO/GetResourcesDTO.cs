@@ -1,3 +1,3 @@
 ﻿namespace Resursko.Domain.DTOs.ResourceDTO;
 
-public record class GetResourcesDTO(string Name, string Description);
+public record class GetResourcesDTO(int Id, string Name, string Description);

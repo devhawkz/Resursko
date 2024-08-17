@@ -1,13 +1,14 @@
 ﻿@inject NavigationManager NavManager;
 
 <MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.House">Home</MudNavLink>
     <AuthorizeView>
         <NotAuthorized>
             <MudNavLink Href="registration" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">Register</MudNavLink>
             <MudNavLink Href="login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login">Login</MudNavLink>
         </NotAuthorized>
         <Authorized>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ViewList">Reservations</MudNavLink>
+            <MudNavLink Href="resources" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ViewList">Resources</MudNavLink>
             <MudNavLink Href="profile" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountBox">Profile</MudNavLink>
             <MudNavLink Match="NavLinkMatch.Prefix" @onclick="Logout" Icon="@Icons.Material.Filled.Logout">Logout</MudNavLink>
         </Authorized>

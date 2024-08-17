@@ -14,10 +14,10 @@
         <DataAnnotationsValidator />
         <MudCard>
             <MudCardContent>
-                <MudTextField Label="Email" @bind-Value="_loginRequest.Email"
+                <MudTextField InputType="InputType.Email" Label="Email" @bind-Value="_loginRequest.Email"
                               For="@(() => _loginRequest.Email)" />
 
-                <MudTextField Label="Password" @bind-Value="_loginRequest.Password"
+                <MudTextField InputType="InputType.Password" Label="Password" @bind-Value="_loginRequest.Password"
                               For="@(() => _loginRequest.Password)" />
             </MudCardContent>
             <MudCardActions>
