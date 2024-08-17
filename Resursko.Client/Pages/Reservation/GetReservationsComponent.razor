@@ -39,7 +39,7 @@
                 @if (isAdmin)
                 {
                     <MudTd DataLabel="Action">
-                        <MudButton @onclick="() => UpdateReservation()" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                        <MudButton @onclick="() => UpdateReservation(context.Id)" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
                         <MudButton @onclick="async () => await DeleteReservation(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
                     </MudTd>
                 }
@@ -75,7 +75,7 @@
     }
 
     void CreateReservation() => NavManager.NavigateTo("/create-reservation");
-    void UpdateReservation() => NavManager.NavigateTo("/update-resource");
+    void UpdateReservation(int id) => NavManager.NavigateTo($"/update-reservation/{id}", forceLoad:true);
 
     async Task DeleteReservation(int id)
     {

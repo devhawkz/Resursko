@@ -1,0 +1,87 @@
+﻿@page "/update-resource/{id:int}"
+
+@using Resursko.Client.Services.ResourceServices
+@using Resursko.Domain.DTOs.ResourceDTO
+
+@inject AuthenticationStateProvider AuthStateProvider;
+@inject IResourceService ResourceService;
+@implements IDisposable
+
+<AuthorizeView Context="authContext">
+    <Authorized>
+        @if (_isAdmin)
+        {
+            <section style="width:600px; margin: 0 auto;">
+                <EditForm Model="_resource" OnValidSubmit="UpdateResource">
+                    <DataAnnotationsValidator />
+                    <MudCard>
+                        <MudCardContent>
+                            <MudTextField Label="Name" @bind-Value="_resource.Name"
+                                          For="@(() => _resource.Name)" />
+
+                            <MudTextField Label="Description" @bind-Value="_resource.Description"
+                                          Multiline="true" Rows="5" For="@(() => _resource.Description)" />
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                                @if (_processing)
+                                {
+                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                    <MudText Class="ms-2">Processing</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Class="ms-2">Update resource</MudText>
+                                }
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </EditForm>
+            </section>
+        }
+        else
+        {
+            <MudText Typo="Typo.h5">You don't have permission to perform this action!</MudText>
+        }
+    </Authorized>
+    <NotAuthorized>
+        Please <MudLink Href="login" Typo="Typo.h5">login</MudLink> to perform this action!
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    [Parameter]
+    public int Id  { get; set; }
+    private ResourceRequest _resource = new ResourceRequest();
+    private bool _processing = false;
+    private string? ErrorMessage;
+    private bool _isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity!.IsAuthenticated)
+            _isAdmin = user.IsInRole("Admin");
+    }
+
+    public async Task UpdateResource()
+    {
+        _processing = true;
+        var result = await ResourceService.UpdateResource(_resource, Id);
+        if (!result.IsSuccessful)
+        {
+            ErrorMessage = result.ErrorMessage;
+        }
+        else
+        {
+            NavManager.NavigateTo("/resources");
+        }
+
+        _processing = false;
+    }
+
+    public void Dispose() => Interceptor.DisposeEvent();
+}

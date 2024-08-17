@@ -31,7 +31,7 @@
                 @if (isAdmin)
                 {
                     <MudTd DataLabel="Action">
-                        <MudButton @onclick="() => UpdateResource()" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                        <MudButton @onclick="() => UpdateResource(context.Id)" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
                         <MudButton @onclick="async () => await DeleteResource(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete"/>
                     </MudTd>
                 }
@@ -67,7 +67,7 @@
     }
 
     void CreateResource() => NavManager.NavigateTo("/create-resource");
-    void UpdateResource() => NavManager.NavigateTo("/update-resource");
+    void UpdateResource(int id) => NavManager.NavigateTo($"/update-resource/{id}", forceLoad: true);
 
     async Task DeleteResource(int id)
     {
