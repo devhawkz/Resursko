@@ -58,7 +58,7 @@
        
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        //Interceptor.RegisterEvent();
+        Interceptor.RegisterEvent();
 
         Elements = await ResourceService.GetAllResources();
 

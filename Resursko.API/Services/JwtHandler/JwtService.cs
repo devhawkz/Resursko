@@ -40,7 +40,7 @@ public class JwtService(IConfiguration configuration, UserManager<User> userMana
             issuer: _jwtSettings["JwtIssuer"],
             audience: _jwtSettings["JwtAudience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings["JwtExpiryInMinutes"])),
+            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings["expiryInMinutes"])),
             signingCredentials: creds
             );
     }
@@ -56,7 +56,7 @@ public class JwtService(IConfiguration configuration, UserManager<User> userMana
 
     internal ClaimsPrincipal GetClaimsPrincipalFromExpiredToken(string token)
     {
-        var tokenValidationParamteters = new TokenValidationParameters
+        var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = true,
             ValidateIssuer = true,
@@ -71,7 +71,7 @@ public class JwtService(IConfiguration configuration, UserManager<User> userMana
         var tokenHandler = new JwtSecurityTokenHandler();
         SecurityToken securityToken;
 
-        var principal = tokenHandler.ValidateToken(token, tokenValidationParamteters, out securityToken);
+        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
         var jwtSecurityToken = securityToken as JwtSecurityToken;
 
         if (jwtSecurityToken is null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))

@@ -14,12 +14,12 @@ emailSender) : IAccountService
     public async Task<AccountLoginResponse> LoginAsync(AccountLoginRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email!);
-        if (user is null || !await userManager.CheckPasswordAsync(user, request.Password!))
+        if(user is null)
             return new AccountLoginResponse(false, ErrorMessage: "Invalid email or password!");
 
         var result = await signInManager.PasswordSignInAsync(user, request.Password!, false, false);
         if (!result.Succeeded)
-            return new AccountLoginResponse(false, ErrorMessage: "An error occurred while trying to sign you in. Please try again!");
+            return new AccountLoginResponse(false, ErrorMessage: "Invalid email or password!");
 
         var roles = await userManager.GetRolesAsync(user);
         var jwtToken = await jwtService.CreateToken(user, roles, true);

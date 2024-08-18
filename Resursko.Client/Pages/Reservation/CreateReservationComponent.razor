@@ -5,6 +5,7 @@
 @using Resursko.Client.Services.ResourceServices
 @using Resursko.Domain.DTOs.ResourceDTO
 
+@implements IDisposable
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IReservationService ReservationService;
 @inject IResourceService ResourceService;
@@ -68,7 +69,11 @@
     private TimeSpan? _endTime;
 
 
-    protected override async Task OnInitializedAsync() => _resources = await ResourceService.GetAllResources();
+    protected override async Task OnInitializedAsync()
+    {
+        Interceptor.RegisterEvent();
+        _resources = await ResourceService.GetAllResources();
+    }
 
     public async Task CreateReservation()
     {
@@ -87,5 +92,5 @@
         _processing = false;
     }
 
-   
+    public void Dispose() => Interceptor.DisposeEvent();
 }

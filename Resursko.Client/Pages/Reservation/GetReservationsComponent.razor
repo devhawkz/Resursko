@@ -23,10 +23,7 @@
                 <MudTh>Start time</MudTh>
                 <MudTh>End time</MudTh>
                 <MudTh>Status</MudTh>
-                @if (isAdmin)
-                {
-                    <MudTh>Action</MudTh>
-                }
+                <MudTh>Action</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -36,19 +33,13 @@
                 <MudTd DataLabel="Start time">@context.StartTime</MudTd>
                 <MudTd DataLabel="End time">@context.EndTime</MudTd>
                 <MudTd DataLabel="Status">@context.Status</MudTd>
-                @if (isAdmin)
-                {
-                    <MudTd DataLabel="Action">
-                        <MudButton @onclick="() => UpdateReservation(context.Id)" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
-                        <MudButton @onclick="async () => await DeleteReservation(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
-                    </MudTd>
-                }
+                <MudTd DataLabel="Action">
+                    <MudButton @onclick="() => UpdateReservation(context.Id)" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                    <MudButton @onclick="async () => await DeleteReservation(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+                </MudTd>
             </RowTemplate>
         </MudTable>
-        @if (isAdmin)
-        {
-            <MudButton @onclick="() => CreateReservation()" Color="Color.Info" StartIcon="@Icons.Material.Filled.AddCircle" />
-        }
+        <MudButton @onclick="() => CreateReservation()" Color="Color.Info" StartIcon="@Icons.Material.Filled.AddCircle" />
     </Authorized>
     <NotAuthorized>
         <MudText Typo="Typo.h5">
@@ -63,10 +54,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-
+        
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        //Interceptor.RegisterEvent();
+        Interceptor.RegisterEvent();
 
         Elements = await ReservationService.GetAllReservations();
 

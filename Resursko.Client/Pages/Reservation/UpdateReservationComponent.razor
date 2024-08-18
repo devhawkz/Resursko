@@ -5,6 +5,7 @@
 @using Resursko.Client.Services.ResourceServices
 @using Resursko.Domain.DTOs.ResourceDTO
 
+@implements IDisposable
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IReservationService ReservationService;
 @inject IResourceService ResourceService;
@@ -81,6 +82,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Interceptor.RegisterEvent();
+
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -108,5 +111,5 @@
         _processing = false;
     }
 
-
+    public void Dispose() => Interceptor.DisposeEvent();
 }

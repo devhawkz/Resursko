@@ -4,9 +4,9 @@ namespace Resursko.Domain.DTOs.Account;
 
 public class AccountLoginRequest
 {
-    [Required, EmailAddress]
+    [Required(ErrorMessage = "Email is required."), EmailAddress]
     public string? Email { get; set; }
 
-    [Required, DataType(DataType.Password)]
+    [Required(ErrorMessage = "Password is required."), DataType(DataType.Password)]
     public string? Password { get; set; }
 }
