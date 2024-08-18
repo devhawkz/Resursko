@@ -1,0 +1,67 @@
+﻿@page "/profile-update"
+
+@using Resursko.Client.Services.UsersService;
+@using Resursko.Domain.DTOs.Account;
+
+@inject AuthenticationStateProvider AuthStateProvider;
+@inject IUserService UserService;
+
+<AuthorizeView Context="authContext">
+    <Authorized>
+        <section style="width:600px; margin: 0 auto;">
+            <EditForm Model="_updatedUser" OnValidSubmit="UpdateUserInfo">
+                <DataAnnotationsValidator />
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField Label="First Name" @bind-Value="_updatedUser.FirstName"
+                                      For="@(() => _updatedUser.FirstName)" />
+
+                        <MudTextField Label="Last Name" @bind-Value="_updatedUser.LastName"
+                                      For="@(() => _updatedUser.LastName)" />
+                        <MudTextField InputType="InputType.Email" Label="Email" @bind-Value="_updatedUser.Email"
+                                      For="@(() => _updatedUser.Email)" />
+
+                        <MudTextField Label="Username" @bind-Value="_updatedUser.UserName"
+                                      For="@(() => _updatedUser.UserName)" />
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Disabled="@_processing" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Processing</MudText>
+                            }
+                            else
+                            {
+                                <MudText Class="ms-2">Update profile</MudText>
+                            }
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </EditForm>
+        </section>
+    </Authorized>
+    <NotAuthorized>
+        Please <MudLink Href="login" Typo="Typo.h5">login</MudLink> to perform this action!
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+    private UpdateUsersInfoRequest _updatedUser = new UpdateUsersInfoRequest();
+    private bool _processing = false;
+
+
+
+
+    public async Task UpdateUserInfo()
+    {
+        _processing = true;
+        var result = await UserService.UpdateUserInfo(_updatedUser);
+        NavManager.NavigateTo("/profile", forceLoad: true);
+
+        _processing = false;
+    }
+
+}

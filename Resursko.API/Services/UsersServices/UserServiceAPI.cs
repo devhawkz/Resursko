@@ -18,11 +18,11 @@ public class UserServiceAPI(IUsersRespository usersRespository, IUserContextServ
         return result;
     }
 
-    public async Task<AccountResponse> UpdateUserInfo(UpdateUsersInfoRequest request)
+    public async Task<AccountLoginResponse> UpdateUserInfo(UpdateUsersInfoRequest request)
     {
         var userId = userContextService.GetUserId();
         if (userId is null)
-            return new AccountResponse(false, "You must login to perform this action!");
+            return new AccountLoginResponse(false, ErrorMessage: "You must login to perform this action!");
 
         var user = request.Adapt<User>();
         user.Id = userId;
@@ -41,5 +41,15 @@ public class UserServiceAPI(IUsersRespository usersRespository, IUserContextServ
 
         var result = await usersRespository.DeleteAccount(userId);
         return result;
+    }
+
+    public async Task<GetAllUsersResponse> GetUserInfo()
+    {
+        var id = userContextService.GetUserId();
+        var result = await usersRespository.GetUserInfo(id);
+        if(result is null)
+            return new GetAllUsersResponse();
+
+        return result!;
     }
 }

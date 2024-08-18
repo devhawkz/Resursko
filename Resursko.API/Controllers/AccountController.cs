@@ -11,7 +11,7 @@ namespace Resursko.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AccountController(IAccountService accountService, IForgotPasswordService passwordService, IUserServiceAPI userService) : ControllerBase
+public class AccountController(IAccountService accountService, IForgotPasswordService passwordService) : ControllerBase
 {
     [HttpPost("registration")]
     public async Task<ActionResult<AccountRegistrationResponse>> Register(AccountRegistrationRequest request)
@@ -41,7 +41,7 @@ public class AccountController(IAccountService accountService, IForgotPasswordSe
         return Unauthorized(result.ErrorMessage);
     }
 
-    [Authorize]
+
     [HttpPost("forgot-password")]
     public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword(ForgotPassword forgotPassword)
     {
@@ -56,7 +56,7 @@ public class AccountController(IAccountService accountService, IForgotPasswordSe
         return BadRequest(result);
     }
 
-    [Authorize]
+
     [HttpPost("reset-password")]
     public async Task<ActionResult<ResetPasswordResponse>> ResetPassword(ResetPassword resetPassword)
     {
@@ -82,30 +82,5 @@ public class AccountController(IAccountService accountService, IForgotPasswordSe
         return Ok(result);
     }
 
-    [Authorize]
-    [HttpPut("update-info")]
-    public async Task<ActionResult<AccountResponse>> UpdateUserInfo(UpdateUsersInfoRequest request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest("Invalid data.");
 
-        var result = await userService.UpdateUserInfo(request);
-
-        if (result.isSuccessful)
-            return Ok(result);
-
-        return BadRequest(result);
-    }
-
-    [Authorize]
-    [HttpDelete("delete-account")]
-    public async Task<ActionResult<AccountResponse>> DeleteAccount()
-    {
-        var result = await userService.DeleteAccount();
-
-        if (result.isSuccessful)
-            return Ok(result);
-
-        return BadRequest(result);
-    }
 }

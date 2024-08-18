@@ -1,0 +1,99 @@
+﻿@page "/profile"
+
+@using Resursko.Client.Services.UsersService
+@using Resursko.Domain.DTOs.Account
+@using Resursko.Client.Pages.Shared;
+
+@inject IUserService UserService;
+@inject IDialogService DialogService;
+
+<AuthorizeView Context="authContext">
+    <Authorized>
+        <MudTable Items="@_users" Hover="true" Striped="true" Bordered="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">User Profile</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>First Name</MudTh>
+                <MudTh>Last Name</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Username</MudTh>
+                <MudTh>Roles</MudTh>
+                <MudTh>No. of active reservations</MudTh>
+                <MudTh>Action</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+                <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="Username">@context.UserName</MudTd>
+                <MudTd DataLabel="Roles">@_role</MudTd>
+                <MudTd DataLabel="No. of active reservations">@context.ActiveReservations</MudTd>
+                <MudTd DataLabel="Action">
+                    <MudButton @onclick="() => ChangeUserInfo()" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                    <MudButton @onclick="async () => await DeleteUser()" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </Authorized>
+    <NotAuthorized>
+        <MudText Typo="Typo.h5">
+            Please <MudLink Href="login" Typo="Typo.h5">login</MudLink> to perform this action!
+        </MudText>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private  GetAllUsersResponse? _userInfo = null;
+    private List<GetAllUsersResponse> _users = new List<GetAllUsersResponse>();
+    private string? _role;
+
+    protected override async Task OnInitializedAsync()
+    {
+            
+            _userInfo = await UserService.GetUserInfo();
+            _role = _userInfo.Roles.FirstOrDefault();
+            _users!.Add(_userInfo);
+            
+    }
+
+    void ChangeUserInfo() => NavManager.NavigateTo("/profile-update");
+
+    async Task DeleteUser()
+    {
+        var toDelete = await ExecuteDialog();
+
+        if (toDelete)
+        {
+            var result = await UserService.DeleteAccount();
+            NavManager.NavigateTo("/", forceLoad:true);
+        }
+    }
+
+    private async Task<bool> ExecuteDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            {"ContentText", "Are you sure you want to delete your account?"},
+            {"ButtonText", "Yes"},
+            {"Color", Color.Error }
+        };
+
+        var options = new DialogOptions()
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.ExtraSmall
+            };
+
+        var dialog = await DialogService.ShowAsync<DialogNotificationComponent>("Delete", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result!.Canceled)
+            return true;
+
+        return false;
+    }
+
+}

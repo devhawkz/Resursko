@@ -3,6 +3,8 @@
 public interface IUsersRespository
 {
     Task<List<GetAllUsersResponse>> GetAllUsers();
-    Task<AccountResponse> UpdateUserInfo(User user);
+    Task<AccountLoginResponse> UpdateUserInfo(User user);
     Task<AccountResponse> DeleteAccount(string id);
+    Task<GetAllUsersResponse> GetUserInfo(string? id);
+
 }
