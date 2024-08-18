@@ -1,4 +1,6 @@
-﻿@using Resursko.Domain.DTOs.Account
+﻿@page "/login"
+
+@using Resursko.Domain.DTOs.Account
 @inject NavigationManager NavManager;
 
 
@@ -55,7 +57,7 @@
         }
         else
         {
-            NavManager.NavigateTo("/reservations");
+            NavManager.NavigateTo("/");
         }
 
         _processing = false;

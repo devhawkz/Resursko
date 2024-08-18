@@ -15,8 +15,8 @@ public class RefreshTokenService(IAccountService accountService, AuthenticationS
         if (!user.Identity!.IsAuthenticated)
         {
             // Preusmeri na stranicu za prijavu
-            navManager.NavigateTo("/"); // ili putanja do stranice za prijavu
-            return string.Empty; // ili neki drugi odgovarajući odgovor
+            navManager.NavigateTo("/login"); 
+            return string.Empty;
         }
 
         var exp = user.FindFirst(c => c.Type.Equals("exp"))!.Value;
