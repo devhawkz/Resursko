@@ -75,7 +75,7 @@
         {
             var result = await ReservationService.DeleteReservation(id);
             if (result.IsSuccessful)
-                NavManager.NavigateTo("/reservations", forceLoad: true);
+                NavManager.NavigateTo("/", forceLoad: true);
 
         }
     }
