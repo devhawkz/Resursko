@@ -4,10 +4,10 @@
 @using Resursko.Domain.DTOs.ResourceDTO
 @using Resursko.Client.Pages.Shared;
 
-@implements IDisposable
 @inject IResourceService ResourceService; 
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IDialogService DialogService;
+
 
 <AuthorizeView Context="authContext">
     <Authorized>
@@ -19,7 +19,7 @@
                 <MudTh>Id</MudTh>
                 <MudTh>Name</MudTh>
                 <MudTh>Description</MudTh>
-                @if (isAdmin)
+                @if (_isAdmin)
                 {
                     <MudTh>Action</MudTh>    
                 }
@@ -28,7 +28,7 @@
                 <MudTd DataLabel="Id">@context.Id</MudTd>
                 <MudTd DataLabel="Name">@context.Name</MudTd>
                 <MudTd DataLabel="Description">@context.Description</MudTd>
-                @if (isAdmin)
+                @if (_isAdmin)
                 {
                     <MudTd DataLabel="Action">
                         <MudButton @onclick="() => UpdateResource(context.Id)" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
@@ -37,7 +37,7 @@
                 }
             </RowTemplate>
         </MudTable>
-        @if (isAdmin)
+        @if (_isAdmin)
         {
             <MudButton @onclick="() => CreateResource()" Color="Color.Info" StartIcon="@Icons.Material.Filled.AddCircle" />
         }
@@ -51,19 +51,27 @@
 
 @code {
     private static List<GetResourcesDTO> Elements = new List<GetResourcesDTO>();
-    private bool isAdmin;
+    private bool _isAdmin;
+    private bool _isSuccessful = false;
 
     protected override async Task OnInitializedAsync()
     {
-       
+
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        Interceptor.RegisterEvent();
+       _isSuccessful = await TokenService.TryRefreshToken();
+
+        if (!_isSuccessful)
+        {
+            if (user is not null || user!.Identity is not null || user.Identity!.IsAuthenticated)
+                await AccountService.Logout();
+            NavManager.NavigateTo("/login");
+        }
 
         Elements = await ResourceService.GetAllResources();
 
         if (user.Identity!.IsAuthenticated)
-            isAdmin = user.IsInRole("Admin");
+            _isAdmin = user.IsInRole("Admin");
     }
 
     void CreateResource() => NavManager.NavigateTo("/create-resource");
@@ -105,6 +113,4 @@
 
         return false;
     }
-
-    public void Dispose() => Interceptor.DisposeEvent();
 }

@@ -5,7 +5,6 @@
 @using Resursko.Client.Services.ResourceServices
 @using Resursko.Domain.DTOs.ResourceDTO
 
-@implements IDisposable
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IReservationService ReservationService;
 @inject IResourceService ResourceService;
@@ -19,7 +18,7 @@
                     <DataAnnotationsValidator />
                     <MudCard>
                         <MudCardContent>
-                            <MudSelect @bind-Value="@_reservation.ResourceId" Label="Select resource" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary" Placeholder="Select resource">
+                            <MudSelect @bind-Value="@_reservation.ResourceId" Label="Select resource" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary" Placeholder="Select resource">Select Resource
                                 @if (_resources is not null)
                                 {
                                     @foreach (var resource in _resources)
@@ -78,14 +77,21 @@
     private DateTime? _endDate;
     private TimeSpan? _startTime;
     private TimeSpan? _endTime;
-
+    private bool _isSuccessful = false;
 
     protected override async Task OnInitializedAsync()
     {
-        Interceptor.RegisterEvent();
-
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
+
+        _isSuccessful = await TokenService.TryRefreshToken();
+
+        if (!_isSuccessful)
+        {
+            if (user is not null || user!.Identity is not null || user.Identity!.IsAuthenticated)
+                await AccountService.Logout();
+            NavManager.NavigateTo("/login");
+        }
 
         if (user.Identity!.IsAuthenticated)
         {
@@ -111,5 +117,4 @@
         _processing = false;
     }
 
-    public void Dispose() => Interceptor.DisposeEvent();
 }

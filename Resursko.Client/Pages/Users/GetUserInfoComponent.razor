@@ -4,7 +4,7 @@
 @using Resursko.Domain.DTOs.Account
 @using Resursko.Client.Pages.Shared;
 
-@implements IDisposable
+
 @inject IUserService UserService;
 @inject IDialogService DialogService;
 
@@ -53,7 +53,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Interceptor.RegisterEvent();
+
         _userInfo = await UserService.GetUserInfo();
         _role = _userInfo.Roles.FirstOrDefault();
         _users!.Add(_userInfo);
@@ -97,5 +97,4 @@
         return false;
     }
 
-    public void Dispose() => Interceptor.DisposeEvent();
 }

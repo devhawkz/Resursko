@@ -79,7 +79,7 @@ namespace Resursko.Client.Services.Account
             var result = JsonSerializer.Deserialize<TokenRefreshRequest>(refreshContent, _jsonSerializerOptions);
 
             if (!refreshResult.IsSuccessStatusCode)
-                throw new ApplicationException("Something went wrong during the refresh token action");
+                return string.Empty;
 
             await _localStorage.SetItemAsync("authToken", result!.AccessToken);
             await _localStorage.SetItemAsync("refreshToken", result!.RefreshToken);

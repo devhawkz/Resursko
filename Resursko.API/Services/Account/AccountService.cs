@@ -22,6 +22,8 @@ emailSender) : IAccountService
             return new AccountLoginResponse(false, ErrorMessage: "Invalid email or password!");
 
         var roles = await userManager.GetRolesAsync(user);
+        var refreshToken = jwtService.GenerateRefreshToken();
+        user.RefreshToken = refreshToken;
         var jwtToken = await jwtService.CreateToken(user, roles, true);
 
         return new AccountLoginResponse(true, Token: jwtToken, RefreshToken: user.RefreshToken!);

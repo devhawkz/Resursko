@@ -5,7 +5,7 @@
 @using Resursko.Client.Services.ResourceServices
 @using Resursko.Domain.DTOs.ResourceDTO
 
-@implements IDisposable
+
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IReservationService ReservationService;
 @inject IResourceService ResourceService;
@@ -67,11 +67,21 @@
     private DateTime? _endDate;
     private TimeSpan? _startTime;
     private TimeSpan? _endTime;
+    private bool _isSuccessful = false;
 
 
     protected override async Task OnInitializedAsync()
     {
-        Interceptor.RegisterEvent();
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        _isSuccessful = await TokenService.TryRefreshToken();
+
+        if (!_isSuccessful)
+        {
+            if (user is not null || user!.Identity is not null || user.Identity!.IsAuthenticated)
+                await AccountService.Logout();
+            NavManager.NavigateTo("/login");
+        }
         _resources = await ResourceService.GetAllResources();
     }
 
@@ -92,5 +102,4 @@
         _processing = false;
     }
 
-    public void Dispose() => Interceptor.DisposeEvent();
 }

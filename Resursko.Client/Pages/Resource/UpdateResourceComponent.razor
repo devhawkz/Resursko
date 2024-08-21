@@ -5,7 +5,7 @@
 
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IResourceService ResourceService;
-@implements IDisposable
+
 
 <AuthorizeView Context="authContext">
     <Authorized>
@@ -57,12 +57,22 @@
     private bool _processing = false;
     private string? ErrorMessage;
     private bool _isAdmin;
+    private bool _isSuccessful = false;
 
     protected override async Task OnInitializedAsync()
     {
-        Interceptor.RegisterEvent();
+
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
+
+        _isSuccessful = await TokenService.TryRefreshToken();
+
+        if (!_isSuccessful)
+        {
+            if (user is not null || user!.Identity is not null || user.Identity!.IsAuthenticated)
+                await AccountService.Logout();
+            NavManager.NavigateTo("/login");
+        }
 
         if (user.Identity!.IsAuthenticated)
             _isAdmin = user.IsInRole("Admin");
@@ -84,5 +94,4 @@
         _processing = false;
     }
 
-    public void Dispose() => Interceptor.DisposeEvent();
 }

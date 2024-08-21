@@ -44,7 +44,7 @@ public class JwtService(IConfiguration configuration, UserManager<User> userMana
             signingCredentials: creds
             );
     }
-    private string GenerateRefreshToken()
+    public string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];
         using(var rng = RandomNumberGenerator.Create())
@@ -84,10 +84,6 @@ public class JwtService(IConfiguration configuration, UserManager<User> userMana
         var claims = GetUserClaims(user, roles);
         var creds = GetUserCredentials();
         var tokenOptions = GenerateTokenOptions(creds, claims);
-
-        var refreshToken = GenerateRefreshToken();
-
-        user.RefreshToken = refreshToken;
 
         if (populateExp)
             user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);

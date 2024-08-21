@@ -3,7 +3,7 @@
 @using Resursko.Client.Services.UsersService;
 @using Resursko.Domain.DTOs.Account;
 
-@implements IDisposable
+
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IUserService UserService;
 
@@ -53,11 +53,7 @@
     private UpdateUsersInfoRequest _updatedUser = new UpdateUsersInfoRequest();
     private bool _processing = false;
 
-    protected override void OnInitialized()
-    {
-        Interceptor.RegisterEvent();
-    }
-
+   
 
     public async Task UpdateUserInfo()
     {
@@ -68,6 +64,4 @@
         _processing = false;
     }
     
-    public void Dispose() => Interceptor.DisposeEvent();
-
 }

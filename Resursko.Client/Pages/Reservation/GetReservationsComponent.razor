@@ -3,7 +3,7 @@
 @using Resursko.Domain.DTOs.ReservationDTO
 @using Resursko.Client.Pages.Shared;
 
-@implements IDisposable
+
 @inject IReservationService ReservationService;
 @inject AuthenticationStateProvider AuthStateProvider;
 @inject IDialogService DialogService;
@@ -50,13 +50,22 @@
 @code {
     private static List<GetAllReservationResponse> Elements = new List<GetAllReservationResponse>();
     private bool isAdmin;
+    private bool _isSuccessful = false;
 
     protected override async Task OnInitializedAsync()
     {
         
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        Interceptor.RegisterEvent();
+
+        _isSuccessful = await TokenService.TryRefreshToken();
+
+        if (!_isSuccessful)
+        {
+            if (user is not null || user!.Identity is not null || user.Identity!.IsAuthenticated)
+                await AccountService.Logout();
+            NavManager.NavigateTo("/login");
+        }
 
         Elements = await ReservationService.GetAllReservations();
 
@@ -104,5 +113,4 @@
         return false;
     }
 
-    public void Dispose() => Interceptor.DisposeEvent();
 }
