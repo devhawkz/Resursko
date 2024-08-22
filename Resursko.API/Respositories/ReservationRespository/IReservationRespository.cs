@@ -8,5 +8,5 @@ public interface IReservationRespository
     Task<List<GetAllReservationResponse>> GetAllReservations();
     Task<ReservationResponse> UpdateReservation(Reservation reservation, int id);
     Task<ReservationResponse> DeleteReservation(int id);
-    Task<List<GetAllReservationResponse>> GetReservationsByCurrentUser();
+    Task<List<GetAllReservationResponse>> GetReservationsByResource(int id);
 }

@@ -17,7 +17,7 @@
                 <DataAnnotationsValidator />
                 <MudCard>
                     <MudCardContent>
-                        <MudSelect @bind-Value="@_reservation.ResourceId" Label="Select resource" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary" Placeholder="Select resource">
+                        <MudSelect @bind-Value="@_reservation.ResourceId" Label="Select resource" OpenIcon="@Icons.Material.Filled.LocalDrink" AdornmentColor="Color.Secondary" Placeholder="Select resource"> 
                             @if (_resources is not null)
                             {
                                 @foreach (var resource in _resources)

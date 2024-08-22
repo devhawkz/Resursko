@@ -57,7 +57,7 @@
         _userInfo = await UserService.GetUserInfo();
         _role = _userInfo.Roles.FirstOrDefault();
         _users!.Add(_userInfo);
-            
+
     }
 
     void ChangeUserInfo() => NavManager.NavigateTo("/profile-update");
@@ -69,7 +69,12 @@
         if (toDelete)
         {
             var result = await UserService.DeleteAccount();
-            NavManager.NavigateTo("/", forceLoad:true);
+            if(result.isSuccessful)
+            {
+                await AccountService.Logout();
+                NavManager.NavigateTo("/login", forceLoad: true);
+            }
+            
         }
     }
 
@@ -93,6 +98,7 @@
 
         if (!result!.Canceled)
             return true;
+
 
         return false;
     }

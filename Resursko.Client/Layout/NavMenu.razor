@@ -4,7 +4,7 @@
     <AuthorizeView>
         <NotAuthorized>
             <MudNavLink Href="registration" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ManageAccounts">Register</MudNavLink>
-            <MudNavLink Href="/" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login">Login</MudNavLink>
+            <MudNavLink Href="/login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login">Login</MudNavLink>
         </NotAuthorized>
         <Authorized>
             <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ViewList">Reservations</MudNavLink>
@@ -21,6 +21,6 @@
     private async Task Logout()
     {
         await AccountService.Logout();
-        NavManager.NavigateTo("/");
+        NavManager.NavigateTo("/login");
     }
 }

@@ -113,16 +113,15 @@ public class ReservationRespository(DataContext context, IUserContextService use
         return new ReservationResponse(true);
     }
 
-    public async Task<List<GetAllReservationResponse>> GetReservationsByCurrentUser()
+    public async Task<List<GetAllReservationResponse>> GetReservationsByResource(int id)
     {
-        var userId = userContextService.GetUserId();
-
-        if (_isListChanged)
+        if (_isListChanged || _reservations is null || _reservations.Count == 0)
             _reservations = await GetAllReservationsFromDb();
 
-        return _reservations.Where(r => r.UserId == userId)
+        return _reservations.Where(r => r.ResourceId == id)
             .Select(r => new GetAllReservationResponse
             {
+                Id = r.Id,
                 Username = r.User.UserName,
                 Email = r.User.Email,
                 ResourceName = r.Resource.Name,

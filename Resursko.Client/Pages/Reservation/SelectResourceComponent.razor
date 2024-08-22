@@ -1,0 +1,51 @@
+﻿
+@using Resursko.Client.Services.ResourceServices;
+@using Resursko.Domain.DTOs.ResourceDTO
+
+@inject IResourceService ResourceService;
+
+<MudPaper Width="200px" Square="true">
+    <MudList T="string">
+        <MudListItem OnClick="GetAllResourcesClick">All resources</MudListItem>
+        <MudDivider />
+       @foreach(var resource in _resources)
+        {
+            <MudListItem>
+                <MudButton @onclick="() => GetResourceClick(resource.Id)">
+                    @resource.Name
+                </MudButton>
+            </MudListItem>
+            <MudDivider />
+        }
+    </MudList>
+</MudPaper>
+
+@code {
+    private int ResourceId { get; set; }
+    private List<GetResourcesDTO> _resources = new List<GetResourcesDTO>();
+
+
+    [Parameter]
+    public EventCallback GetAllResourcesClickEvent { get; set; }
+
+    [Parameter]
+    public EventCallback<int> GetResourceClickEvent { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        _resources = await ResourceService.GetAllResources();
+    }
+
+    private async Task GetAllResourcesClick()
+    {
+        ResourceId = 0;
+        await GetAllResourcesClickEvent.InvokeAsync();
+    }
+
+    private async Task GetResourceClick(int id)
+    {
+        ResourceId = id;
+        await GetResourceClickEvent.InvokeAsync(ResourceId);
+    }
+
+}

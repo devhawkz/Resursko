@@ -10,35 +10,42 @@
 
 <AuthorizeView Context="authContext">
     <Authorized>
-        <MudTable Items="@Elements" Hover="true" Striped="true" Bordered="true">
-            <ToolBarContent>
-                <MudText Typo="Typo.h6">Company reservation table</MudText>
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh>Id</MudTh>
-                <MudTh>Username</MudTh>
-                <MudTh>Email</MudTh>
-                <MudTh>Resource name</MudTh>
-                <MudTh>Start time</MudTh>
-                <MudTh>End time</MudTh>
-                <MudTh>Status</MudTh>
-                <MudTh>Action</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="Name">@context.Username</MudTd>
-                <MudTd DataLabel="Description">@context.Email</MudTd>
-                <MudTd DataLabel="Resource Name">@context.ResourceName</MudTd>
-                <MudTd DataLabel="Start time">@context.StartTime</MudTd>
-                <MudTd DataLabel="End time">@context.EndTime</MudTd>
-                <MudTd DataLabel="Status">@context.Status</MudTd>
-                <MudTd DataLabel="Action">
-                    <MudButton @onclick="() => UpdateReservation(context.Id)" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
-                    <MudButton @onclick="async () => await DeleteReservation(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
-        <MudButton @onclick="() => CreateReservation()" Color="Color.Info" StartIcon="@Icons.Material.Filled.AddCircle" />
+        <MudGrid>
+            <MudItem xs="3">
+                <SelectResourceComponent GetAllResourcesClickEvent="GetAllResourcesClickEvent" GetResourceClickEvent="GetResourceClickEvent" />
+            </MudItem>
+            <MudItem xs="9">
+                <MudTable Items="@Elements" Hover="true" Striped="true" Bordered="true">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">Company reservation table</MudText>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Id</MudTh>
+                        <MudTh>Username</MudTh>
+                        <MudTh>Email</MudTh>
+                        <MudTh>Resource name</MudTh>
+                        <MudTh>Start time</MudTh>
+                        <MudTh>End time</MudTh>
+                        <MudTh>Status</MudTh>
+                        <MudTh>Action</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Id">@context.Id</MudTd>
+                        <MudTd DataLabel="Name">@context.Username</MudTd>
+                        <MudTd DataLabel="Description">@context.Email</MudTd>
+                        <MudTd DataLabel="Resource Name">@context.ResourceName</MudTd>
+                        <MudTd DataLabel="Start time">@context.StartTime</MudTd>
+                        <MudTd DataLabel="End time">@context.EndTime</MudTd>
+                        <MudTd DataLabel="Status">@context.Status</MudTd>
+                        <MudTd DataLabel="Action">
+                            <MudButton @onclick="() => UpdateReservation(context.Id)" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                            <MudButton @onclick="async () => await DeleteReservation(context.Id)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+                <MudButton @onclick="() => CreateReservation()" Color="Color.Info" StartIcon="@Icons.Material.Filled.AddCircle" />
+            </MudItem>
+        </MudGrid>
     </Authorized>
     <NotAuthorized>
         <MudText Typo="Typo.h5">
@@ -54,7 +61,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -67,10 +74,23 @@
             NavManager.NavigateTo("/login");
         }
 
-        Elements = await ReservationService.GetAllReservations();
-
         if (user.Identity!.IsAuthenticated)
             isAdmin = user.IsInRole("Admin");
+    }
+
+
+    private async Task GetAllResourcesClickEvent()
+    {
+        Elements = await ReservationService.GetAllReservations();
+    }
+
+    private async Task GetResourceClickEvent(int id)
+    {
+        if (id == 0)
+            return;
+
+        Elements.Clear();
+        Elements = await ReservationService.GetReservationsByResourceId(id);
     }
 
     void CreateReservation() => NavManager.NavigateTo("/create-reservation");

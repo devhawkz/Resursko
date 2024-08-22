@@ -66,5 +66,16 @@ namespace Resursko.Client.Services.ReservationServices
 
             return new ReservationResponse(true);
         }
+
+        public async Task<List<GetAllReservationResponse>> GetReservationsByResourceId(int id)
+        {
+            var response = await _httpClient.GetAsync($"api/reservation/reservations-resource/{id}");
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                return new List<GetAllReservationResponse>();
+
+            return JsonSerializer.Deserialize<List<GetAllReservationResponse>>(responseContent, _jsonSerializerOptions)!;
+        }
     }
 }

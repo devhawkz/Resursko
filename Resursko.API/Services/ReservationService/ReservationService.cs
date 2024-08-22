@@ -43,9 +43,12 @@ public class ReservationService(IReservationRespository reservationRespository) 
         return result;
     }
 
-    public async Task<List<GetAllReservationResponse>> GetReservationsByCurrentUser()
+    public async Task<List<GetAllReservationResponse>> GetReservationsByResource(int id)
     {
-        var result = await reservationRespository.GetReservationsByCurrentUser();
+        if(id <= -1)
+            return new List<GetAllReservationResponse>();
+
+        var result = await reservationRespository.GetReservationsByResource(id);
 
         if (result is null || result.Count == 0)
             return new List<GetAllReservationResponse>();
